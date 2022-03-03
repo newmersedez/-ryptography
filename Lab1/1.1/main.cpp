@@ -9,16 +9,17 @@ void	bitwiseShuffle(std::bitset<MAX> bytes, std::vector<size_t> rule)
 {
 	size_t	temp;
 
+	if (rule.size() != MAX)
+			throw std::length_error("Bytes array size != rule vector size");	
 	for (size_t i = 0; i < MAX; i++)
 	{
 		if (i >= MAX)
 			throw std::out_of_range("Index error");
-		else if (rule[i] < rule[rule[i]])
-		{
-			temp = bytes[i];
-			bytes[i] = bytes[rule[i]];
-			bytes[rule[i]] = temp;
-		}
+		temp = bytes[i];
+		bytes[i] = bytes[rule[i]];
+		bytes[rule[i]] = temp;
+		rule.erase(std::find(rule.begin(), rule.end(), rule[i]));
+		rule.erase(std::find(rule.begin(), rule.end(), rule[rule[i]]));
 	}
 }
 
