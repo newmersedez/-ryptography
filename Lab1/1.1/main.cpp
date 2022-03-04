@@ -5,7 +5,7 @@
 #include <algorithm>
 
 template <size_t MAX>
-void	bitwiseShuffle(std::bitset<MAX> bytes, std::vector<size_t> rule)
+void	bitwiseShuffle(std::bitset<MAX>& bytes, std::vector<size_t> rule)
 {
 	size_t	temp;
 
