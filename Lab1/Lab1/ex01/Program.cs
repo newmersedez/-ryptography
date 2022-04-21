@@ -5,35 +5,34 @@ namespace Lab1
 {
     class Program
     {
-        
-        private static byte[] CreateBytesArray(int size)
+        private static byte[] CreateBytesArray(uint size)
         {
             if (size == 0)
                 throw new Exception("Size must be greater than 0");
             
             Random rnd = new Random();
             byte[] bytes = new byte[size];
-            for (int i = 0; i < size; ++i)
+            for (uint i = 0; i < size; ++i)
             {
                 bytes[i] = (byte)rnd.Next(0, 2);
             }
             return bytes;
         }
 
-        private static int[] CreateRuleArray(int size)
+        private static uint[] CreateRuleArray(uint size)
         {
             if (size == 0)
                 throw new Exception("Size must be greater than 0");
 
             Random rnd = new Random();
-            var numbers = Enumerable.Range(0, size).OrderBy(x => rnd.Next()).Take(size);
-            int[] rule = numbers.ToArray();
+            var numbers = Enumerable.Range(0, (int)size).OrderBy(x => rnd.Next()).Take((int)size).ToList();
+            var rule = numbers.Select(x => (uint)x).ToArray();
             return rule;
         }
 
-        private static void TestPBlock(int testCount, int size)
+        private static void TestPBlock(uint testCount, uint size)
         {
-            for (int i = 0; i < testCount; ++i)
+            for (uint i = 0; i < testCount; ++i)
             {
                 var bytes = CreateBytesArray(size);
                 var rule = CreateRuleArray(size);
@@ -62,22 +61,22 @@ namespace Lab1
             }
         }
 
-        public static byte[] PBlock(in byte[] bytes, in int[] rule)
+        public static byte[] PBlock(in byte[] bytes, in uint[] rule)
         {
             if (bytes.Length != rule.Length)
                 throw new Exception("Length of bytes array and rule array must be the same");
             
             byte[] newBytes = new byte[bytes.Length];
-            for (int i = 0; i < rule.Length; ++i)
+            for (uint i = 0; i < rule.Length; i++)
             {
-                newBytes[rule[i]] = bytes[i];
+                newBytes[i] = bytes[rule[i]];
             }
             return newBytes;
         }
         
         public static void Main(string[] args)
         {
-            TestPBlock(10, 5);
+            TestPBlock(3, 5);
         }
     }
 }
