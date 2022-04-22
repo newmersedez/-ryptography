@@ -3,11 +3,11 @@
 #include <array>
 #include <bitset>
 
-template <size_t bitset_size, size_t bitset_count>
+template <size_t key_size, size_t key_count>
 class KeyExtensionClass
 {
-typedef std::bitset<bitset_size> bitset;
-typedef std::array<bitset_size, bitset_count> bitset_array;
+typedef std::bitset<key_size> bitset;
+typedef std::array<key_size, key_count> bitset_array;
 
 public:
 	virtual ~KeyExtensionClass();
