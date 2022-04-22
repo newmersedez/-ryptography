@@ -39,7 +39,7 @@ std::bitset<bytes_size / old_size * new_size>
 		if (new_block_iter != rule.end())
 		{
 			std::bitset<new_bytes_size> new_block((*new_block_iter).second.to_ullong());
-			new_bytes = (new_bytes << new_size) | new_block;
+			new_bytes = new_block << (i * new_size) | new_bytes;
 		}
 		else
 			throw std::logic_error("This block doesn`t exist");
