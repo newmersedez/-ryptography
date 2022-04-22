@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Linq;
 
-namespace Lab1
+namespace Lab1.ex01
 {
-    class Program
+    public sealed class PBlockTesting
     {
         private static byte[] CreateBytesArray(uint size)
         {
-            if (size == 0)
-                throw new Exception("Size must be greater than 0");
-            
             Random rnd = new Random();
             byte[] bytes = new byte[size];
             for (uint i = 0; i < size; ++i)
@@ -19,24 +16,21 @@ namespace Lab1
             return bytes;
         }
 
-        private static uint[] CreateRuleArray(uint size)
+        private static byte[] CreateRule(uint size)
         {
-            if (size == 0)
-                throw new Exception("Size must be greater than 0");
-
             Random rnd = new Random();
-            var numbers = Enumerable.Range(0, (int)size).OrderBy(x => rnd.Next()).Take((int)size).ToList();
-            var rule = numbers.Select(x => (uint)x).ToArray();
+            var numbers = Enumerable.Range(0, (int)size).OrderBy(_ => rnd.Next()).Take((int)size).ToList();
+            var rule = numbers.Select(x => (byte)x).ToArray();
             return rule;
         }
-
-        private static void TestPBlock(uint testCount, uint size)
+        
+        internal static void TestPBlock(uint testCount, uint size)
         {
             for (uint i = 0; i < testCount; ++i)
             {
-                var bytes = CreateBytesArray(size);
-                var rule = CreateRuleArray(size);
-                var newBytes = PBlock(bytes, rule);
+                var bytes = PBlockTesting.CreateBytesArray(size);
+                var rule = PBlockTesting.CreateRule(size);
+                var newBytes = PBlockClass.PBlock(bytes, rule);
 
                 Console.Write("Bytes array: ");
                 foreach (var elem in bytes)
@@ -57,12 +51,19 @@ namespace Lab1
                 {
                     Console.Write(elem);
                 }
-                Console.WriteLine("\n");
+                Console.WriteLine("\n---\n");
             }
         }
+    }
 
-        public static byte[] PBlock(in byte[] bytes, in uint[] rule)
+    public sealed class PBlockClass
+    {
+        public static byte[] PBlock(in byte[] bytes, in byte[] rule)
         {
+            if (bytes.Length == 0)
+                throw new Exception("Bytes array cannot be empty");
+            if (rule.Length == 0)
+                throw new Exception("Rule array cannot be empty");
             if (bytes.Length != rule.Length)
                 throw new Exception("Length of bytes array and rule array must be the same");
             
@@ -72,11 +73,6 @@ namespace Lab1
                 newBytes[i] = bytes[rule[i]];
             }
             return newBytes;
-        }
-        
-        public static void Main(string[] args)
-        {
-            TestPBlock(3, 5);
         }
     }
 }

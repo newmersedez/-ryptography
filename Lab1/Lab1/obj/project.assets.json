@@ -8,24 +8,26 @@
     "net5.0": []
   },
   "packageFolders": {
-    "/Users/lorphan/.nuget/packages/": {}
+    "C:\\Users\\Дмитрий\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/lorphan/Cryptography/Lab1/Lab1/Lab1.csproj",
+      "projectUniqueName": "D:\\3 курс 6 семестр\\Cryptography\\Lab1\\Lab1\\Lab1.csproj",
       "projectName": "Lab1",
-      "projectPath": "/Users/lorphan/Cryptography/Lab1/Lab1/Lab1.csproj",
-      "packagesPath": "/Users/lorphan/.nuget/packages/",
-      "outputPath": "/Users/lorphan/Cryptography/Lab1/Lab1/obj/",
+      "projectPath": "D:\\3 курс 6 семестр\\Cryptography\\Lab1\\Lab1\\Lab1.csproj",
+      "packagesPath": "C:\\Users\\Дмитрий\\.nuget\\packages\\",
+      "outputPath": "D:\\3 курс 6 семестр\\Cryptography\\Lab1\\Lab1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/lorphan/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Дмитрий\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -58,7 +60,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.203/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -13,3 +13,19 @@
 /Users/lorphan/Cryptography/Lab1/Lab1/obj/Debug/net5.0/ref/Lab1.dll
 /Users/lorphan/Cryptography/Lab1/Lab1/obj/Debug/net5.0/Lab1.pdb
 /Users/lorphan/Cryptography/Lab1/Lab1/obj/Debug/net5.0/Lab1.genruntimeconfig.cache
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\Lab1.exe
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\Lab1.deps.json
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\Lab1.runtimeconfig.json
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\Lab1.runtimeconfig.dev.json
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\Lab1.dll
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\ref\Lab1.dll
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\bin\Debug\net5.0\Lab1.pdb
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.csproj.AssemblyReference.cache
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.GeneratedMSBuildEditorConfig.editorconfig
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.AssemblyInfoInputs.cache
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.AssemblyInfo.cs
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.csproj.CoreCompileInputs.cache
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.dll
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\ref\Lab1.dll
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.pdb
+D:\3 курс 6 семестр\Cryptography\Lab1\Lab1\obj\Debug\net5.0\Lab1.genruntimeconfig.cache

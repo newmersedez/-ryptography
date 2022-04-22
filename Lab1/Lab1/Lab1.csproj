@@ -5,12 +5,4 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="ex02" />
-      <Folder Include="ex03" />
-      <Folder Include="ex04" />
-      <Folder Include="ex05" />
-      <Folder Include="ex06" />
-    </ItemGroup>
-
 </Project>
