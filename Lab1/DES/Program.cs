@@ -6,7 +6,12 @@ namespace DES
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            int a = 512;
+            var bytes = BitConverter.GetBytes(a);
+            foreach (var elem in bytes)
+            {
+                Console.WriteLine(elem);
+            }
         }
     }
 }
