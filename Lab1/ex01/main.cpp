@@ -17,8 +17,8 @@ int main()
 		std::array<size_t, size> rule{0, 1, 2, 3, 4, 5, 6, 7};
 		std::bitset<size> new_bytes = pBlock(bytes, rule);
 
-		std::cout << "Old bytes array: " << bytes << std::endl;
-		std::cout << "New bytes array: " << new_bytes << "\n" << std::endl;
+		std::cout << "Old bytes: " << bytes << std::endl;
+		std::cout << "New bytes: " << new_bytes << "\n" << std::endl;
 	}
 	
 	return 0;
