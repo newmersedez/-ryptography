@@ -1,7 +1,8 @@
 #include <iostream>
-#include "CryptoClass.hpp"
+#include "SymmetricEncryption.hpp"
 
 int main()
 {
+
 	return 0;
 }
