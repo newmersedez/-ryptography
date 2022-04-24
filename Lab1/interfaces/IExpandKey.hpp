@@ -3,17 +3,17 @@
 #include <bitset>
 #include <array>
 
-template <size_t bitset_size, size_t key_size, size_t key_count>
+template <size_t key_size, size_t round_key_size, size_t round_key_count>
 class IExpandKey
 {
 public:
-	typedef std::bitset<bitset_size> bitset;
 	typedef std::bitset<key_size> key;
-	typedef std::array<key, key_count> key_array;
+	typedef std::bitset<round_key_size> round_key;
+	typedef std::array<round_key, round_key_count> round_key_array;
 
     virtual ~IExpandKey()
 	{};
 
 protected:
-    virtual key_array generateRoundKeys(const key& key) = 0;
+    virtual round_key_array generateRoundKeys(const key& key) = 0;
 };
