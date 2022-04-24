@@ -13,7 +13,6 @@ public:
 
     virtual ~IExpandKey()
 	{};
-
-protected:
+	
     virtual round_key_array_type generateRoundKeys(const key_type& key) = 0;
 };

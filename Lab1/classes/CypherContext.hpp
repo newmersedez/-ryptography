@@ -1,10 +1,8 @@
 #pragma once
 
-#include <fstream>
 #include "../interfaces/ICrypto.hpp"
-#include "../utils/constants.hpp"
-#include "../utils/pBlock.hpp"
-#include "../utils/sBlock.hpp"
+#include "../interfaces/IExpandKey.hpp"
+#include "../interfaces/ICypherTransform.hpp"
 
 enum class EncryptionMode
 {
@@ -17,62 +15,20 @@ enum class EncryptionMode
 	RD_H
 };
 
-template <size_t decrypted_size, size_t encrypted_size,
-	size_t key_size, size_t round_key_size, size_t round_key_count>
-class CypherContext : public ICrypto<decrypted_size, encrypted_size,
-	key_size, round_key_size, round_key_count>
+
+template <size_t key_size, size_t round_key_size, size_t round_key_count>
+class KeyExpandClass
+	: public IExpandKey<key_size, round_key_size, round_key_count>
 {
 private:
-	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::key_type key_type;
-	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::round_key_type round_key_type;
-	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::round_key_array_type round_key_array_type;
-	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::encrypted_bitset_type encrypted_bitset_type;
-	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::decrypted_bitset_type decrypted_bitset_type;
+	typedef typename IExpandKey<key_size, round_key_size,
+		round_key_count>::key_type key_type;
+	typedef typename IExpandKey<key_size, round_key_size,
+		round_key_count>::round_key_type round_key_type;
+	typedef typename IExpandKey<key_size, round_key_size,
+		round_key_count>::round_key_array_type round_key_array_type;
 
-	key_type _key;
-	EncryptionMode _mode;
-
-	std::ifstream _openInputFileStream(const std::string input_file)
-	{
-		std::ifstream in_stream(input_file);
-
-		if (!in_stream.is_open())
-			throw std::invalid_argument("Incorrect input filename");
-		if (in_stream.peek() == std::ifstream::traits_type::eof())
-			throw std::invalid_argument("Empty imput file");
-		return in_stream;
-	}
-
-	std::ofstream _openOutputFileStream(const std::string output_file)
-	{
-		std::ofstream out_stream(output_file);
-
-		if (!out_stream.is_open())
-			throw std::invalid_argument("Incorrect output filename");
-		return out_stream;
-	}
-
-	encrypted_bitset_type encrypt(const decrypted_bitset_type& bitset,
-		const round_key_array_type& keys) override
-	{
-		switch(this->_mode)
-		{
-			case EncryptionMode::ECB:
-
-		}
-	}
-
-	decrypted_bitset_type decrypt(const encrypted_bitset_type& bitset,
-		const round_key_array_type& keys) override
-	{
-		
-	}
-
+public:
 	round_key_array_type generateRoundKeys(const key_type& key) override
 	{
 		std::bitset<key_size> divider(0xFFFFFFF);
@@ -99,45 +55,56 @@ private:
 		}
 		return round_keys_array;
 	}
+};
+
+
+template <size_t encrypted_size, size_t bitset_size, size_t key_size>
+class CypherTransformClass
+	: public ICypherTransform<encrypted_size, bitset_size, key_size>
+{
+private:
+	typedef typename ICypherTransform<encrypted_size,
+		bitset_size, key_size>::key_type key_type;
+	typedef typename ICypherTransform<encrypted_size,
+		bitset_size, key_size>::decrypted_bitset_type decrypted_bitset_type;
+	typedef typename ICypherTransform<encrypted_size,
+		bitset_size, key_size>::encrypted_bitset_type encrypted_bitset_type;
 
 public:
-	CypherContext() = delete;
-	
-	explicit CypherContext(const key_type& key, EncryptionMode mode, ...) noexcept
-		: _key(key), _mode(mode)
+	encrypted_bitset_type cypherTransform(const decrypted_bitset_type& bitset,
+		const key_type& key) override
+	{}
+};
+
+
+template <size_t decrypted_size, size_t encrypted_size,
+	size_t key_size, size_t round_key_size, size_t round_key_count>
+class CypherContext
+	: public ICrypto<decrypted_size, encrypted_size, key_size, round_key_size, round_key_count>
+{
+private:
+		typedef typename ICrypto<decrypted_size, encrypted_size, key_size, 
+			round_key_size, round_key_count>::key_type key_type;
+		typedef typename ICrypto<decrypted_size, encrypted_size, key_size,
+			round_key_size, round_key_count>::round_key_type round_key_type;
+		typedef typename ICrypto<decrypted_size, encrypted_size, key_size,
+			round_key_size, round_key_count>::round_key_array_type round_key_array_type;
+		typedef typename ICrypto<decrypted_size, encrypted_size, key_size,
+			round_key_size, round_key_count>::encrypted_bitset_type encrypted_bitset_type;
+		typedef typename ICrypto<decrypted_size, encrypted_size, key_size,
+			round_key_size, round_key_count>::decrypted_bitset_type decrypted_bitset_type;
+
+	key_type _key;
+	EncryptionMode _mode;
+	IExpandKey<key_size, round_key_size, round_key_count> *_key_expand;
+	ICypherTransform<encrypted_size, decrypted_size, key_size> *_cypher_transform;
+
+public:
+	encrypted_bitset_type encrypt(const decrypted_bitset_type& bitset,
+		const round_key_array_type& keys) override
 	{}
 
-	void encrypt(const std::string& input_file, const std::string& output_file)
-	{
-		std::ifstream in_stream = _openInputFileStream(input_file);
-		std::ofstream out_stream = _openOutputFileStream(output_file);
-		round_key_array_type round_keys_array = generateRoundKeys(_key);
-
-		std::string str((std::istreambuf_iterator<char>(in_stream)), std::istreambuf_iterator<char>());
-		std::bitset<56> bin_str[str.size()];
-		std::bitset<56> bin_cypher[str.size];
-		
-		for (int i = 0; i < str.size(); ++i)
-		{
-			bin_str[i] = std::bitset<56>((int) str[i]);
-			bin_cypher[i] = this->encrypt()
-			// std::cout << bin_str[i] << std::endl; // print for checking
-		}
-
-		in_stream.close();
-		out_stream.close();
-	}
-
-	void decrypt(const std::string& input_file, const std::string& output_file)
-	{
-		std::ifstream in_stream = _openInputFileStream(input_file);
-		std::ofstream out_stream = _openOutputFileStream(output_file);
-		
-
-		in_stream.close();
-		out_stream.close();
-	}
-
-	~CypherContext()
+	decrypted_bitset_type decrypt(const encrypted_bitset_type& bitset,
+		const round_key_array_type& keys) override
 	{}
 };
