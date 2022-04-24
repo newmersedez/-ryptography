@@ -7,7 +7,7 @@ int main()
 	const std::string outputFile = "test.out.txt";
 	std::bitset<56> key(123456);
 
-	SymmetricEncrypter<64, 32, 56, 48, 16> crypto(key, EncryptionMode::ECB);
+	CypherContext<64, 32, 56, 48, 16> crypto(key, EncryptionMode::ECB);
 
 	crypto.encrypt(inputFile, outputFile);
 	return 0;

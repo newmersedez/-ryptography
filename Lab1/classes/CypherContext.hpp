@@ -19,7 +19,7 @@ enum class EncryptionMode
 
 template <size_t decrypted_size, size_t encrypted_size,
 	size_t key_size, size_t round_key_size, size_t round_key_count>
-class SymmetricEncrypter : public ICrypto<decrypted_size, encrypted_size,
+class CypherContext : public ICrypto<decrypted_size, encrypted_size,
 	key_size, round_key_size, round_key_count>
 {
 private:
@@ -60,7 +60,11 @@ private:
 	encrypted_bitset_type encrypt(const decrypted_bitset_type& bitset,
 		const round_key_array_type& keys) override
 	{
-		
+		switch(this->_mode)
+		{
+			case EncryptionMode::ECB:
+
+		}
 	}
 
 	decrypted_bitset_type decrypt(const encrypted_bitset_type& bitset,
@@ -73,8 +77,8 @@ private:
 	{
 		std::bitset<key_size> divider(0xFFFFFFF);
 		std::bitset<key_size> p_key = pBlock(key, constants::key_start_permutation);
-		std::bitset<key_size / 2> c0_key = std::bitset<28>(((p_key >> key_size / 2) & divider).to_ullong());
-		std::bitset<key_size / 2> d0_key = std::bitset<28>((p_key & divider).to_ullong());
+		std::bitset<key_size / 2> c0_key = std::bitset<key_size / 2>(((p_key >> key_size / 2) & divider).to_ullong());
+		std::bitset<key_size / 2> d0_key = std::bitset<key_size / 2>((p_key & divider).to_ullong());
 
 		std::array<std::bitset<round_key_size>, round_key_count> round_keys_array;
 		std::bitset<round_key_size> round_key;
@@ -97,9 +101,9 @@ private:
 	}
 
 public:
-	SymmetricEncrypter() = delete;
+	CypherContext() = delete;
 	
-	explicit SymmetricEncrypter(const key_type& key, EncryptionMode mode, ...) noexcept
+	explicit CypherContext(const key_type& key, EncryptionMode mode, ...) noexcept
 		: _key(key), _mode(mode)
 	{}
 
@@ -107,14 +111,19 @@ public:
 	{
 		std::ifstream in_stream = _openInputFileStream(input_file);
 		std::ofstream out_stream = _openOutputFileStream(output_file);
-		
 		round_key_array_type round_keys_array = generateRoundKeys(_key);
 
-		std::cout << "_key\t=\t" << _key << "\n" << std::endl;
-		for (size_t i = 0; i < round_key_count; ++i)
+		std::string str((std::istreambuf_iterator<char>(in_stream)), std::istreambuf_iterator<char>());
+		std::bitset<56> bin_str[str.size()];
+		std::bitset<56> bin_cypher[str.size];
+		
+		for (int i = 0; i < str.size(); ++i)
 		{
-			std::cout << "key" << i << "\t=\t" << round_keys_array[i] << std::endl;
+			bin_str[i] = std::bitset<56>((int) str[i]);
+			bin_cypher[i] = this->encrypt()
+			// std::cout << bin_str[i] << std::endl; // print for checking
 		}
+
 		in_stream.close();
 		out_stream.close();
 	}
@@ -129,6 +138,6 @@ public:
 		out_stream.close();
 	}
 
-	~SymmetricEncrypter()
+	~CypherContext()
 	{}
 };
