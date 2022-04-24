@@ -3,8 +3,7 @@
 #include <bitset>
 #include <array>
 
-template <size_t decrypted_bitset_size, size_t encrypted_bitset_size,
-	size_t key_size, size_t key_count>
+template <size_t decrypted_bitset_size, size_t encrypted_bitset_size, size_t key_size, size_t key_count>
 class ICrypto
 {
 public:
@@ -17,7 +16,6 @@ public:
 	{};
 
 protected:
-	virtual encrypted_bitset encrypt(const decrypted_bitset& bitset, const key& key) = 0;
-	virtual decrypted_bitset decrypt(const encrypted_bitset& bitset, const key& key) = 0;
-	virtual key_array expandKey(const key& key) = 0;
+	virtual encrypted_bitset encrypt(const decrypted_bitset& bitset, const key_array& keys) = 0;
+	virtual decrypted_bitset decrypt(const encrypted_bitset& bitset, const key_array& keys) = 0;
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include "../interfaces/ICrypto.hpp"
 
 enum class EncryptionMode
@@ -31,35 +32,59 @@ private:
 	key _key;
 	EncryptionMode _mode;
 
-	encrypted_bitset encrypt(const decrypted_bitset& bitset, const key& key) override
+	encrypted_bitset encrypt(const decrypted_bitset& bitset, const key_array& keys) override
 	{
 	
 	}
 	
-	decrypted_bitset decrypt(const encrypted_bitset& bitset, const key& key) override
+	decrypted_bitset decrypt(const encrypted_bitset& bitset, const key_array& keys) override
 	{
 		
 	}
-	
-	key_array expandKey(const key& key) override
+
+	std::ifstream openInputFileStream(const std::string inputFile)
 	{
-	
+		std::ifstream inStream(inputFile);
+
+		if (!inStream.is_open())
+			throw std::invalid_argument("Incorrect input filename");
+		if (inStream.peek() == std::ifstream::traits_type::eof())
+			throw std::invalid_argument("Empty imput file");
+		return inStream;
+	}
+
+	std::ofstream openOutputFileStream(const std::string outputFile)
+	{
+		std::ofstream outStream(outputFile);
+
+		if (!outStream.is_open())
+			throw std::invalid_argument("Incorrect output filename");
+		return outStream;
 	}
 
 public:
 	SymmetricEncrypter() = default;
+	
 	explicit SymmetricEncrypter(const key& key, EncryptionMode mode) noexcept
 		: _key(key), _mode(mode)
 	{}
 
 	void encrypt(const std::string& inputFile, const std::string& outputFile)
 	{
-
+		std::ifstream inStream = openInputFileStream(inputFile);
+		std::ofstream outStream = openOutputFileStream(outputFile);
+		
+		inStream.close();
+		outStream.close();
 	}
 
 	void decrypt(const std::string& inputFile, const std::string& outputFile)
 	{
-
+		std::ifstream inStream = openInputFileStream(inputFile);
+		std::ofstream outStream = openOutputFileStream(outputFile);
+		
+		inStream.close();
+		outStream.close();
 	}
 
 	~SymmetricEncrypter()
