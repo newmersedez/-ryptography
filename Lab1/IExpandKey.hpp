@@ -4,13 +4,15 @@
 #include <array>
 
 template <size_t bitset_size, size_t key_size, size_t key_count>
-class IExpandKey
+class IRoundKeyGenerator
 {
-typedef std::bitset<bitset_size> bitset;
-typedef std::bitset<key_size> key;
-typedef std::array<key, key_count> key_array;
-
 public:
-    virtual ~IExpandKey();
-    virtual key_array expandKey(const bitset& bitset) = 0;
+	typedef std::bitset<bitset_size> bitset;
+	typedef std::bitset<key_size> key;
+	typedef std::array<key, key_count> key_array;
+
+    virtual ~IRoundKeyGenerator();
+
+protected:
+    virtual key_array generateRoundKeys(const bitset& bitset) = 0;
 };
