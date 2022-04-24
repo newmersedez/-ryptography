@@ -2,9 +2,10 @@
 
 #include <bitset>
 #include <array>
+#include "IExpandKey.hpp"
 
 template <size_t decrypted_bitset_size, size_t encrypted_bitset_size, size_t key_size, size_t key_count>
-class ICrypto
+class ICrypto : virtual IExpandKey<decrypted_bitset_size, key_size, key_count>
 {
 public:
 	typedef std::bitset<encrypted_bitset_size> encrypted_bitset;

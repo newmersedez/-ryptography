@@ -42,6 +42,11 @@ private:
 		
 	}
 
+	key_array generateRoundKeys(const key& key) override
+	{
+
+	}
+
 	std::ifstream openInputFileStream(const std::string inputFile)
 	{
 		std::ifstream inStream(inputFile);
@@ -63,9 +68,9 @@ private:
 	}
 
 public:
-	SymmetricEncrypter() = default;
+	SymmetricEncrypter() = delete;
 	
-	explicit SymmetricEncrypter(const key& key, EncryptionMode mode) noexcept
+	explicit SymmetricEncrypter(const key& key, EncryptionMode mode, ...) noexcept
 		: _key(key), _mode(mode)
 	{}
 
