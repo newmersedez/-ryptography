@@ -10,7 +10,8 @@ public:
 	typedef std::bitset<key_size> key;
 	typedef std::bitset<encrypted_bitset_size> transform_bitset;
 
-    virtual ~ICypherTransform();
+    virtual ~ICypherTransform()
+	{};
 
 protected:
     virtual transform_bitset cypherTransform(const bitset& bitset, const key& key) = 0;

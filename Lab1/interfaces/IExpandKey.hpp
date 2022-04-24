@@ -11,7 +11,8 @@ public:
 	typedef std::bitset<key_size> key;
 	typedef std::array<key, key_count> key_array;
 
-    virtual ~IRoundKeyGenerator();
+    virtual ~IRoundKeyGenerator()
+	{};
 
 protected:
     virtual key_array generateRoundKeys(const bitset& bitset) = 0;

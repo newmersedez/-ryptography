@@ -11,9 +11,10 @@ public:
 	typedef std::bitset<encrypted_bitset_size> encrypted_bitset;
 	typedef std::bitset<decrypted_bitset_size> decrypted_bitset;
 	typedef std::bitset<key_size> key; 
-	typedef std::arrat<key, key_count> key_array;
+	typedef std::array<key, key_count> key_array;
 
-    virtual ~ICrypto();
+    virtual ~ICrypto()
+	{};
 
 protected:
 	virtual encrypted_bitset encrypt(const decrypted_bitset& bitset, const key& key) = 0;
