@@ -5,11 +5,12 @@
 template <size_t encrypted_size, size_t decrypted_size, size_t key_size>
 class ICypherTransform
 {
-public:
+protected:
 	typedef std::bitset<key_size> key_type;
 	typedef std::bitset<decrypted_size> decrypted_bitset_type;
 	typedef std::bitset<encrypted_size> encrypted_bitset_type;
 
+public:
     virtual ~ICypherTransform()
 	{};
 	
