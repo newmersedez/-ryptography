@@ -2,6 +2,9 @@
 
 #include <fstream>
 #include "../interfaces/ICrypto.hpp"
+#include "../utils/constants.hpp"
+#include "../utils/pBlock.hpp"
+#include "../utils/sBlock.hpp"
 
 enum class EncryptionMode
 {
@@ -21,77 +24,109 @@ class SymmetricEncrypter : public ICrypto<decrypted_size, encrypted_size,
 {
 private:
 	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::key key;
+		key_size, round_key_size, round_key_count>::key_type key_type;
 	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::round_key round_key;
+		key_size, round_key_size, round_key_count>::round_key_type round_key_type;
 	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::round_key_array round_key_array;
+		key_size, round_key_size, round_key_count>::round_key_array_type round_key_array_type;
 	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::encrypted_bitset encrypted_bitset;
+		key_size, round_key_size, round_key_count>::encrypted_bitset_type encrypted_bitset_type;
 	typedef typename ICrypto<decrypted_size, encrypted_size,
-		key_size, round_key_size, round_key_count>::decrypted_bitset decrypted_bitset;
+		key_size, round_key_size, round_key_count>::decrypted_bitset_type decrypted_bitset_type;
 
-	key _key;
+	key_type _key;
 	EncryptionMode _mode;
 
-	encrypted_bitset encrypt(const decrypted_bitset& bitset, const round_key_array& keys) override
+	std::ifstream _openInputFileStream(const std::string input_file)
 	{
-		
-	}
+		std::ifstream in_stream(input_file);
 
-	decrypted_bitset decrypt(const encrypted_bitset& bitset, const round_key_array& keys) override
-	{
-		
-	}
-
-	round_key_array generateRoundKeys(const key& key) override
-	{
-
-	}
-
-	std::ifstream openInputFileStream(const std::string inputFile)
-	{
-		std::ifstream inStream(inputFile);
-
-		if (!inStream.is_open())
+		if (!in_stream.is_open())
 			throw std::invalid_argument("Incorrect input filename");
-		if (inStream.peek() == std::ifstream::traits_type::eof())
+		if (in_stream.peek() == std::ifstream::traits_type::eof())
 			throw std::invalid_argument("Empty imput file");
-		return inStream;
+		return in_stream;
 	}
 
-	std::ofstream openOutputFileStream(const std::string outputFile)
+	std::ofstream _openOutputFileStream(const std::string output_file)
 	{
-		std::ofstream outStream(outputFile);
+		std::ofstream out_stream(output_file);
 
-		if (!outStream.is_open())
+		if (!out_stream.is_open())
 			throw std::invalid_argument("Incorrect output filename");
-		return outStream;
+		return out_stream;
+	}
+
+	encrypted_bitset_type encrypt(const decrypted_bitset_type& bitset,
+		const round_key_array_type& keys) override
+	{
+		
+	}
+
+	decrypted_bitset_type decrypt(const encrypted_bitset_type& bitset,
+		const round_key_array_type& keys) override
+	{
+		
+	}
+
+	round_key_array_type generateRoundKeys(const key_type& key) override
+	{
+		std::bitset<key_size> divider(0xFFFFFFF);
+		std::bitset<key_size> p_key = pBlock(key, constants::key_start_permutation);
+		std::bitset<key_size / 2> c0_key = std::bitset<28>(((p_key >> key_size / 2) & divider).to_ullong());
+		std::bitset<key_size / 2> d0_key = std::bitset<28>((p_key & divider).to_ullong());
+
+		std::array<std::bitset<round_key_size>, round_key_count> round_keys_array;
+		std::bitset<round_key_size> round_key;
+		std::bitset<key_size / 2> ci_key;
+		std::bitset<key_size / 2> di_key;
+		size_t shuffle;
+
+		for (size_t i = 0; i < round_key_count; ++i)
+		{
+			shuffle = constants::shuffle_array[i];
+			ci_key = (c0_key << shuffle) | (c0_key >> ((key_size / 2) - shuffle));
+			di_key = (d0_key << shuffle) | (d0_key >> ((key_size / 2)  - shuffle));
+			round_key = std::bitset<round_key_size>(((ci_key << (key_size / 2)) | di_key).to_ullong());
+			round_keys_array[i] = pBlock(round_key, constants::key_end_permutation);
+
+			c0_key = ci_key;
+			d0_key = di_key;
+		}
+		return round_keys_array;
 	}
 
 public:
 	SymmetricEncrypter() = delete;
 	
-	explicit SymmetricEncrypter(const key& key, EncryptionMode mode, ...) noexcept
+	explicit SymmetricEncrypter(const key_type& key, EncryptionMode mode, ...) noexcept
 		: _key(key), _mode(mode)
 	{}
 
-	void encrypt(const std::string& inputFile, const std::string& outputFile)
+	void encrypt(const std::string& input_file, const std::string& output_file)
 	{
-		std::ifstream inStream = openInputFileStream(inputFile);
-		std::ofstream outStream = openOutputFileStream(outputFile);
+		std::ifstream in_stream = _openInputFileStream(input_file);
+		std::ofstream out_stream = _openOutputFileStream(output_file);
 		
-		inStream.close();
-		outStream.close();
+		round_key_array_type round_keys_array = generateRoundKeys(_key);
+
+		std::cout << "_key\t=\t" << _key << "\n" << std::endl;
+		for (size_t i = 0; i < round_key_count; ++i)
+		{
+			std::cout << "key" << i << "\t=\t" << round_keys_array[i] << std::endl;
+		}
+		in_stream.close();
+		out_stream.close();
 	}
 
-	void decrypt(const std::string& inputFile, const std::string& outputFile)
+	void decrypt(const std::string& input_file, const std::string& output_file)
 	{
-		std::ifstream inStream = openInputFileStream(inputFile);
-		std::ofstream outStream = openOutputFileStream(outputFile);
+		std::ifstream in_stream = _openInputFileStream(input_file);
+		std::ofstream out_stream = _openOutputFileStream(output_file);
 		
-		inStream.close();
-		outStream.close();
+
+		in_stream.close();
+		out_stream.close();
 	}
 
 	~SymmetricEncrypter()
