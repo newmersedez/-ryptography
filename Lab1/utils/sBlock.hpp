@@ -31,7 +31,7 @@ std::bitset<size / s_old_size * s_new_size>
 	}
 	
     const int s_blocks_count = size / s_old_size;
-    std::bitset<size / s_old_size * s_new_size> new_bytes;
+    std::bitset<size / s_old_size * s_new_size> new_bytes;	
     std::bitset<s_old_size> key_block;
 
     for (int block_number = 0; block_number < s_blocks_count; ++block_number)
@@ -42,6 +42,8 @@ std::bitset<size / s_old_size * s_new_size>
         }
         for (int i = 0; i < s_new_size; ++i)
         {
+			if (rule.find(key_block) == rule.end())
+				throw std::invalid_argument("Invalid key");
             new_bytes[block_number * s_new_size + i] = rule[key_block][i];
         }
     }
