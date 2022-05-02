@@ -11,5 +11,8 @@ int main()
 	CypherTransformClass cypher_transform;
 	CypherContext crypto(key, EncryptionMode::ECB);
 
+	crypto.setKeyExpand(&key_expand);
+	crypto.setCypherTransform(&cypher_transform);
+	crypto.encrypt(inputFile, outputFile);
 	return 0;
 }

@@ -67,11 +67,36 @@ public:
 		: _key(key), _mode(mode), _key_expand(nullptr), _cypher_transform(nullptr)
 	{}
 
+	void setKeyExpand(const IExpandKey *key_expand)
+	{
+		this->_key_expand = const_cast<IExpandKey *>(key_expand);
+	}
+
+	void setCypherTransform(const ICypherTransform *cypher_transform)
+	{
+		this->_cypher_transform = const_cast<ICypherTransform *>(cypher_transform);
+	}
+
 	void encrypt(const std::string& input_file, const std::string& output_file)
 	{
+		if (this->_key_expand == nullptr)
+			throw std::invalid_argument("Key expand not set");
+		if (this->_cypher_transform == nullptr)
+			throw std::invalid_argument("Cypher transform expand not set");
+
 		std::ifstream in_stream = _openInputFileStream(input_file);
 		std::ofstream out_stream = _openOutputFileStream(output_file);
-		
+		std::string str((std::istreambuf_iterator<char>(in_stream)), std::istreambuf_iterator<char>());
+		round_key_array_type round_keys = this->_key_expand->generateRoundKeys(this->_key);
+    	decrypted_block_type decrypted_block[str.size()];
+		encrypted_block_type encrypted_block;
+
+    	for (int i = 0; i < str.size(); ++i)
+		{
+    		decrypted_block[i] = decrypted_block_type((int) str[i]);
+			encrypted_block = this->encrypt(decrypted_block[i], round_keys);
+			out_stream << static_cast<char>(encrypted_block.to_ullong());
+		}
 
 		in_stream.close();
 		out_stream.close();
@@ -79,9 +104,24 @@ public:
 
 	void decrypt(const std::string& input_file, const std::string& output_file)
 	{
+		if (this->_key_expand == nullptr)
+			throw std::invalid_argument("Key expand not set");
+		if (this->_cypher_transform == nullptr)
+			throw std::invalid_argument("Cypher transform expand not set");
+
 		std::ifstream in_stream = _openInputFileStream(input_file);
 		std::ofstream out_stream = _openOutputFileStream(output_file);
-		
+		std::string str((std::istreambuf_iterator<char>(in_stream)), std::istreambuf_iterator<char>());
+		round_key_array_type round_keys = this->_key_expand->generateRoundKeys(this->_key);
+		encrypted_block_type encrypted_block[str.size()];
+    	decrypted_block_type decrypted_block;
+
+    	for (int i = 0; i < str.size(); ++i)
+		{
+    		encrypted_block[i] = encrypted_block_type((int) str[i]);
+			decrypted_block = this->decrypt(encrypted_block[i], round_keys);
+			out_stream << static_cast<char>(decrypted_block.to_ullong());
+		}
 
 		in_stream.close();
 		out_stream.close();
