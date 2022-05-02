@@ -18,27 +18,13 @@ enum class EncryptionMode
 	RD_H
 };
 
-template <size_t encrypted_size, size_t decrypted_size,
-	size_t key_size, size_t round_key_size, size_t round_key_count>
-class CypherContext
-	: public ICrypto<encrypted_size, decrypted_size, key_size, round_key_size, round_key_count>
+class CypherContext : public ICrypto
 {
-private:
-	typedef typename ICrypto<encrypted_size, decrypted_size, key_size,
-		round_key_size, round_key_count>::key_type key_type;
-	typedef typename ICrypto<encrypted_size, decrypted_size, key_size,
-		round_key_size, round_key_count>::round_key_type round_key_type;
-	typedef typename ICrypto<encrypted_size, decrypted_size, key_size,
-		round_key_size, round_key_count>::round_key_array_type round_key_array_type;
-	typedef typename ICrypto<encrypted_size, decrypted_size, key_size,
-		round_key_size, round_key_count>::encrypted_block_type encrypted_block_type;
-	typedef typename ICrypto<encrypted_size, decrypted_size, key_size,
-		round_key_size, round_key_count>::decrypted_block_type decrypted_block_type;
 
 	key_type _key;
 	EncryptionMode _mode;
-	IExpandKey<key_size, round_key_size, round_key_count> *_key_expand;
-	ICypherTransform<encrypted_size, key_size> *_cypher_transform;
+	IExpandKey *_key_expand;
+	ICypherTransform *_cypher_transform;
 
 	std::ifstream _openInputFileStream(const std::string input_file)
 	{

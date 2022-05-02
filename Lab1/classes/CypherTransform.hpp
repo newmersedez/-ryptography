@@ -3,16 +3,8 @@
 #include "../interfaces/ICypherTransform.hpp"
 #include "../utils/pBlock.hpp"
 
-template <size_t encrypted_size, size_t round_key_size>
-class CypherTransformClass
-	: public ICypherTransform<encrypted_size, round_key_size>
+class CypherTransformClass : public ICypherTransform
 {
-private:
-	typedef typename ICypherTransform<encrypted_size,
-		round_key_size>::encrypted_block_type encrypted_block_type;
-	typedef typename ICypherTransform<encrypted_size,
-		round_key_size>::round_key_type round_key_type;
-
 public:
 	CypherTransformClass()
 	{}
@@ -24,7 +16,7 @@ public:
 			= pBlock(std::bitset<round_key_size>(block.to_ullong()), constants::expanding_permutation);
 		std::bitset<round_key_size> expanded_block
 			= std::bitset<round_key_size>(permutated_block.to_ullong()) ^ round_key;
-		std::bitset<encrypted_size> transformed_block;
+		encrypted_block_type transformed_block;
 
 		for (size_t i = 0; i < 8; ++i)
 		{

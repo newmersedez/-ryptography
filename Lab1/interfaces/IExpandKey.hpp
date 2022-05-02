@@ -2,15 +2,10 @@
 
 #include <bitset>
 #include <array>
+#include "../utils/DES_traits.hpp"
 
-template <size_t key_size, size_t round_key_size, size_t round_key_count>
 class IExpandKey
 {
-protected:
-	typedef std::bitset<key_size> key_type;
-	typedef std::bitset<round_key_size> round_key_type;
-	typedef std::array<round_key_type, round_key_count> round_key_array_type;
-
 public:
     virtual ~IExpandKey()
 	{};

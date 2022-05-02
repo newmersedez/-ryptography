@@ -1,14 +1,10 @@
 #pragma once
 
 #include <bitset>
+#include "../utils/DES_traits.hpp"
 
-template <size_t encrypted_size, size_t round_key_size>
 class ICypherTransform
 {
-protected:
-	typedef std::bitset<encrypted_size> encrypted_block_type;
-	typedef std::bitset<round_key_size> round_key_type;
-
 public:
     virtual ~ICypherTransform()
 	{};

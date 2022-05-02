@@ -4,17 +4,8 @@
 #include "../utils/constants.hpp"
 #include "../utils/pBlock.hpp"
 
-template <size_t key_size, size_t round_key_size, size_t round_key_count>
-class KeyExpandClass
-	: public IExpandKey<key_size, round_key_size, round_key_count>
+class KeyExpandClass : public IExpandKey
 {
-private:
-	typedef typename IExpandKey<key_size, round_key_size,
-		round_key_count>::key_type key_type;
-	typedef typename IExpandKey<key_size, round_key_size,
-		round_key_count>::round_key_type round_key_type;
-	typedef typename IExpandKey<key_size, round_key_size,
-		round_key_count>::round_key_array_type round_key_array_type;
 
 public:
 	KeyExpandClass()
