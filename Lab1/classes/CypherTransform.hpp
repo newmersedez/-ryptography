@@ -9,8 +9,7 @@ public:
 	CypherTransformClass()
 	{}
 
-    encrypted_block_type cypherTransform(const encrypted_block_type& block,
-		const round_key_type& round_key) override
+    encrypted_block_type cypherTransform(const encrypted_block_type& block, const round_key_type& round_key) override
 	{
 		std::bitset<round_key_size> permutated_block
 			= pBlock(std::bitset<round_key_size>(block.to_ullong()), constants::expanding_permutation);
@@ -28,6 +27,7 @@ public:
 			new_s_block = new_s_block << (i * 4);
 			transformed_block = transformed_block | std::bitset<32>(new_s_block.to_ullong());
 		}
+		transformed_block = pBlock(transformed_block, constants::feistel_permutation);
 		return transformed_block;
 	}
 

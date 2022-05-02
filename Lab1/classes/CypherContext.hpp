@@ -26,38 +26,32 @@ class CypherContext : public ICrypto
 	IExpandKey *_key_expand;
 	ICypherTransform *_cypher_transform;
 
-	std::ifstream _openInputFileStream(const std::string input_file)
+	encrypted_block_type encrypt(const decrypted_block_type& block) override
 	{
-		std::ifstream in_stream(input_file);
+		std::bitset<decrypted_size> divider(0xFFFFFFF);
+		std::bitset<decrypted_size / 2> left = std::bitset<decrypted_size / 2>(((block >> decrypted_size / 2) & divider).to_ullong());
+		std::bitset<decrypted_size / 2> right = std::bitset<decrypted_size / 2>((block & divider).to_ullong());
+		round_key_array_type round_keys = this->_key_expand->generateRoundKeys(this->_key);
+		encrypted_block_type result;
 
-		if (!in_stream.is_open())
-			throw std::invalid_argument("Incorrect input filename");
-		if (in_stream.peek() == std::ifstream::traits_type::eof())
-			throw std::invalid_argument("Empty imput file");
-		return in_stream;
+		left = this->_cypher_transform->cypherTransform(left, round_keys[0]);
+		right = this->_cypher_transform->cypherTransform(right, round_keys[0]);
+		result = std::bitset<encrypted_size>(((left << (encrypted_size / 2)) | right).to_ullong());
+		return result;
 	}
 
-	std::ofstream _openOutputFileStream(const std::string output_file)
+	decrypted_block_type decrypt(const encrypted_block_type& block) override
 	{
-		std::ofstream out_stream(output_file);
+		// std::bitset<encrypted_size> divider(0xFFFFFFF);
+		// std::bitset<encrypted_size / 2> left = std::bitset<encrypted_size / 2>(((block >> encrypted_size / 2) & divider).to_ullong());
+		// std::bitset<encrypted_size / 2> right = std::bitset<encrypted_size / 2>((block & divider).to_ullong());
+		// round_key_array_type round_keys = this->_key_expand->generateRoundKeys(this->_key);
+		// decrypted_block_type result;
 
-		if (!out_stream.is_open())
-			throw std::invalid_argument("Incorrect output filename");
-		return out_stream;
-	}
-
-	encrypted_block_type encrypt(const decrypted_block_type& block,
-		const round_key_array_type& keys) override
-	{
-		encrypted_block_type ret;
-		return ret;
-	}
-
-	decrypted_block_type decrypt(const encrypted_block_type& block,
-		const round_key_array_type& keys) override
-	{
-		decrypted_block_type ret;
-		return ret;
+		// left = this->_cypher_transform->cypherTransform(left, round_keys[0]);
+		// right = this->_cypher_transform->cypherTransform(right, round_keys[0]);
+		// result = std::bitset<encrypted_size>(((left << (encrypted_size / 2)) | right).to_ullong());
+		// return result;
 	}
 
 public:
@@ -77,54 +71,36 @@ public:
 		this->_cypher_transform = const_cast<ICypherTransform *>(cypher_transform);
 	}
 
-	void encrypt(const std::string& input_file, const std::string& output_file)
+	encrypted_block_type encrypt(const std::string& input_file, const std::string& output_file)
 	{
 		if (this->_key_expand == nullptr)
-			throw std::invalid_argument("Key expand not set");
+			throw std::invalid_argument("Key expand class must not be empty");
 		if (this->_cypher_transform == nullptr)
-			throw std::invalid_argument("Cypher transform expand not set");
+			throw std::invalid_argument("Cypher transform must not be empty");
+		
+		std::ifstream input_fstream(input_file);
+		std::ofstream output_fstream(output_file);
+		std::string str((std::istreambuf_iterator<char>(input_fstream)),
+			std::istreambuf_iterator<char>());
 
-		std::ifstream in_stream = _openInputFileStream(input_file);
-		std::ofstream out_stream = _openOutputFileStream(output_file);
-		std::string str((std::istreambuf_iterator<char>(in_stream)), std::istreambuf_iterator<char>());
-		round_key_array_type round_keys = this->_key_expand->generateRoundKeys(this->_key);
     	decrypted_block_type decrypted_block[str.size()];
-		encrypted_block_type encrypted_block;
-
-    	for (int i = 0; i < str.size(); ++i)
+		encrypted_block_type encrypted_block;	
+		
+		for (size_t i = 0; i < str.size(); ++i)
 		{
-    		decrypted_block[i] = decrypted_block_type((int) str[i]);
-			encrypted_block = this->encrypt(decrypted_block[i], round_keys);
-			out_stream << static_cast<char>(encrypted_block.to_ullong());
+			decrypted_block[i] = decrypted_block_type((int) str[i]);
+			encrypted_block = encrypt(decrypted_block[i]);
+			output_fstream << static_cast<char>(encrypted_block.to_ullong());
 		}
-
-		in_stream.close();
-		out_stream.close();
+		
+		input_fstream.close();
+		output_fstream.close();
+		return encrypted_block;
 	}
 
-	void decrypt(const std::string& input_file, const std::string& output_file)
+	decrypted_block_type decrypt(const std::string& input_file, const std::string& output_file)
 	{
-		if (this->_key_expand == nullptr)
-			throw std::invalid_argument("Key expand not set");
-		if (this->_cypher_transform == nullptr)
-			throw std::invalid_argument("Cypher transform expand not set");
-
-		std::ifstream in_stream = _openInputFileStream(input_file);
-		std::ofstream out_stream = _openOutputFileStream(output_file);
-		std::string str((std::istreambuf_iterator<char>(in_stream)), std::istreambuf_iterator<char>());
-		round_key_array_type round_keys = this->_key_expand->generateRoundKeys(this->_key);
-		encrypted_block_type encrypted_block[str.size()];
-    	decrypted_block_type decrypted_block;
-
-    	for (int i = 0; i < str.size(); ++i)
-		{
-    		encrypted_block[i] = encrypted_block_type((int) str[i]);
-			decrypted_block = this->decrypt(encrypted_block[i], round_keys);
-			out_stream << static_cast<char>(decrypted_block.to_ullong());
-		}
-
-		in_stream.close();
-		out_stream.close();
+		
 	}
 
 	~CypherContext()

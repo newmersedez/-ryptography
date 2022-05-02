@@ -6,7 +6,7 @@ namespace constants
 {
 
 	/* Key generator constants */
-	const std::array<size_t, 56> key_first_permutation =
+	const std::array<size_t, 56> key_start_permutation =
 	{
 		49, 42, 35, 28, 21, 14, 7,  0,  50, 43, 36, 29, 22, 15,
 		8,  1,  51, 44, 37, 30, 23, 16, 9,  2,  52, 45, 38, 31,
@@ -19,7 +19,7 @@ namespace constants
 		1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
 	};
 
-	const std::array<size_t, 48> key_second_permutation =
+	const std::array<size_t, 48> key_end_permutation =
 	{
 		13, 16, 10, 23, 0,  4,  2,  27, 14, 5,  20, 9,  22, 18, 11, 3,
 		25, 7,  15, 6,  26, 19, 12, 1,  40, 51, 30, 36, 46, 54, 29, 39,
@@ -34,14 +34,7 @@ namespace constants
 		34,	2,	42,	10,	50,	18,	58,	26,	33,	1,	41,	9,	49,	17,	57,	25
 	};
 
-	/* Transform constants */
-	const std::array<size_t, 64> IP =
-	{
-		57, 49, 41, 33, 25, 17, 9,  1, 59, 51, 43, 35, 27, 19, 11, 3,
-		61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7,
-		56, 48, 40, 32, 24, 16, 8,  0, 58, 50, 42, 34, 26, 18, 10, 2,
-		60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38, 30, 22, 14, 6
-	};
+	/* Cypher transform constants */
 
 	const std::array<size_t, 48> expanding_permutation =
 	{
@@ -53,14 +46,6 @@ namespace constants
 		19, 20, 21, 22, 23, 24,
 		23, 24, 25, 26, 27, 28,
 		27, 28, 29, 30, 31, 0
-	};
-
-	const std::array<size_t, 32> feistel_permutation =
-	{
-		15, 6,  19, 20, 28, 11, 27, 16,
-		0,  14, 22, 25, 4,  17, 30, 9,
-		1,  7,  23, 13, 31, 26, 2,  8,
-		18, 12, 29, 5,  21, 10, 3,  24
 	};
 
 	const size_t s_table[8][4][16] =
@@ -113,5 +98,22 @@ namespace constants
 			{ 7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8 },
 			{ 2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11 }
 		}
+	};
+
+	const std::array<size_t, 32> feistel_permutation =
+	{
+		15, 6,  19, 20, 28, 11, 27, 16,
+		0,  14, 22, 25, 4,  17, 30, 9,
+		1,  7,  23, 13, 31, 26, 2,  8,
+		18, 12, 29, 5,  21, 10, 3,  24
+	};
+
+	/* Cypher context constants */
+	const std::array<size_t, 64> transform_start_permutation =
+	{
+		57, 49, 41, 33, 25, 17, 9,  1, 59, 51, 43, 35, 27, 19, 11, 3,
+		61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7,
+		56, 48, 40, 32, 24, 16, 8,  0, 58, 50, 42, 34, 26, 18, 10, 2,
+		60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38, 30, 22, 14, 6
 	};
 }
