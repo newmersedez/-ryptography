@@ -17,30 +17,36 @@ private:
 		round_key_count>::round_key_array_type round_key_array_type;
 
 public:
-	round_key_array_type generateRoundKeys(const key_type& key) override
+	KeyExpandClass()
+	{}
+	
+	round_key_array_type generateRoundKeys(const key_type& key) const override
 	{
 		std::bitset<key_size> divider(0xFFFFFFF);
-		std::bitset<key_size> p_key = pBlock(key, constants::key_start_permutation);
-		std::bitset<key_size / 2> c0_key = std::bitset<key_size / 2>(((p_key >> key_size / 2) & divider).to_ullong());
-		std::bitset<key_size / 2> d0_key = std::bitset<key_size / 2>((p_key & divider).to_ullong());
+		std::bitset<key_size> p_key = pBlock(key, constants::key_first_permutation);
+		std::bitset<key_size / 2> c0 = std::bitset<key_size / 2>(((p_key >> key_size / 2) & divider).to_ullong());
+		std::bitset<key_size / 2> d0 = std::bitset<key_size / 2>((p_key & divider).to_ullong());
 
 		std::array<std::bitset<round_key_size>, round_key_count> round_keys_array;
 		std::bitset<round_key_size> round_key;
-		std::bitset<key_size / 2> ci_key;
-		std::bitset<key_size / 2> di_key;
+		std::bitset<key_size / 2> ci;
+		std::bitset<key_size / 2> di;
 		size_t shuffle;
 
-		for (size_t i = 0; i < round_key_count; ++i)
+		for (size_t round = 0; round < round_key_count; ++round)
 		{
-			shuffle = constants::shuffle_array[i];
-			ci_key = (c0_key << shuffle) | (c0_key >> ((key_size / 2) - shuffle));
-			di_key = (d0_key << shuffle) | (d0_key >> ((key_size / 2)  - shuffle));
-			round_key = std::bitset<round_key_size>(((ci_key << (key_size / 2)) | di_key).to_ullong());
-			round_keys_array[i] = pBlock(round_key, constants::key_end_permutation);
+			shuffle = constants::shuffle_array[round];
+			ci = (c0 << shuffle) | (c0 >> ((key_size / 2) - shuffle));
+			di = (d0 << shuffle) | (d0 >> ((key_size / 2)  - shuffle));
+			round_key = std::bitset<round_key_size>(((ci << (key_size / 2)) | di).to_ullong());
+			round_keys_array[round] = pBlock(round_key, constants::key_second_permutation);
 
-			c0_key = ci_key;
-			d0_key = di_key;
+			c0 = ci;
+			d0 = di;
 		}
 		return round_keys_array;
 	}
+
+	~KeyExpandClass()
+	{}
 };

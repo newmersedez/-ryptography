@@ -2,18 +2,17 @@
 
 #include <bitset>
 
-template <size_t encrypted_size, size_t decrypted_size, size_t key_size>
+template <size_t encrypted_size, size_t round_key_size>
 class ICypherTransform
 {
 protected:
-	typedef std::bitset<key_size> key_type;
-	typedef std::bitset<decrypted_size> decrypted_bitset_type;
-	typedef std::bitset<encrypted_size> encrypted_bitset_type;
+	typedef std::bitset<encrypted_size> encrypted_block_type;
+	typedef std::bitset<round_key_size> round_key_type;
 
 public:
     virtual ~ICypherTransform()
 	{};
 	
-    virtual encrypted_bitset_type cypherTransform(const decrypted_bitset_type& bitset,
-		const key_type& key) = 0;
+    virtual encrypted_block_type cypherTransform(const encrypted_block_type& block,
+		const round_key_type& round_key) = 0;
 };

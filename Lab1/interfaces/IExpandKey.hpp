@@ -15,5 +15,5 @@ public:
     virtual ~IExpandKey()
 	{};
 	
-    virtual round_key_array_type generateRoundKeys(const key_type& key) = 0;
+    virtual round_key_array_type generateRoundKeys(const key_type& key) const = 0;
 };
