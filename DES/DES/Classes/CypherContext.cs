@@ -6,26 +6,28 @@ namespace DES.Classes
 {
     internal enum EncryptionMode
     {
-        ECB,
-        CBC,
-        CFB,
-        OFB,
-        CTR,
-        RD,
-        RDH
+        Ecb,
+        Cbc,
+        Cfb,
+        Ofb,
+        Ctr,
+        Rd,
+        Rdh
     };
 
     internal class CypherContext
     {
         private byte[] _key;
         private EncryptionMode _mode;
-        private IExpandKey _keyExpand;
-        private ICypherTransform _cypherTransform;
+        private byte[] _initializationVector;
+        public IExpandKey KeyGenerator { get; set; }
+        public ICypherTransform CypherEncrypter { get; set; }
         
-        public CypherContext(byte[] key, EncryptionMode mode)
+        public CypherContext(byte[] key, EncryptionMode mode, byte[] initializationVector)
         {
             this._key = key;
             this._mode = mode;
+            this._initializationVector = initializationVector;
         }
 
         public byte[] Encrypt(byte[] block)
@@ -38,5 +40,9 @@ namespace DES.Classes
             throw new NotImplementedException();
         }
 
+        private byte[] PaddingPkcs7(byte[] block)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

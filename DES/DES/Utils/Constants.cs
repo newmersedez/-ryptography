@@ -100,5 +100,11 @@ namespace DES.Utils
         };
         
         #endregion
+
+        #region CypherContextConstants
+
+        public static int BlockSize = 8;
+
+        #endregion
     }
 }

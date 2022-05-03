@@ -4,6 +4,6 @@
     {
         public byte[] Encrypt(byte[] block);
         public byte[] Decrypt(byte[] block);
-        public void SetKey(byte[] key);
+        public void GetRoundKeys(byte[] key);
     }
 }
