@@ -14,7 +14,7 @@ namespace DES.Classes
             var expandedBlock = BitConverter.ToUInt64(permutedBlock) ^ BitConverter.ToUInt64(roundKey);
             
             ulong transformedBlock = 0;
-            for (int i = 0; i < 8; ++i)
+            for (var i = 0; i < 8; ++i)
             {
                 var sBlock = expandedBlock >> (i * 6) & (1 << 6) - 1;
                 var edgeBits = ((sBlock >> 5) << 1) | (sBlock & 1);

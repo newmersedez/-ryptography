@@ -9,7 +9,7 @@ namespace DES.Utils
         {
             var number = BitConverter.ToUInt64(block, 0);
             ulong permutedBlock = 0;
-            for (int i = 0; i < rule.Length; ++i)
+            for (var i = 0; i < rule.Length; ++i)
             {
                 permutedBlock |= ((number >> (rule[i] - 1)) & 1) << i;
             }
@@ -20,7 +20,7 @@ namespace DES.Utils
         {
             var number = BitConverter.ToUInt32(block, 0);
             ulong permutedBlock = 0;
-            for (int i = 0; i < rule.Length; ++i)
+            for (var i = 0; i < rule.Length; ++i)
             {
                 permutedBlock |= ((number >> (rule[i] - 1)) & 1) << i;
             }
@@ -31,7 +31,7 @@ namespace DES.Utils
         {
             var number = BitConverter.ToUInt64(block, 0);
             ulong substitutedBlock = 0;
-            for (int i = 0; i < rule.Count; ++i)
+            for (var i = 0; i < rule.Count; ++i)
             {
                 var keyBlock = (byte)((number >> i * count) & (ulong)((1 << count) - 1));
                 var sBlock = rule[keyBlock];
@@ -44,7 +44,7 @@ namespace DES.Utils
         {
             var number = BitConverter.ToUInt32(block, 0);
             ulong substitutedBlock = 0;
-            for (int i = 0; i < rule.Count; ++i)
+            for (var i = 0; i < rule.Count; ++i)
             {
                 var keyBlock = (byte)((number >> i * count) & (ulong)((1 << count) - 1));
                 var sBlock = rule[keyBlock];

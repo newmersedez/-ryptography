@@ -15,7 +15,7 @@ namespace DES.Classes
             var d = number & ((1 << 28) - 1);
 
             var roundKeys = new byte[16][];
-            for (int round = 0; round < 16; ++round)
+            for (var round = 0; round < 16; ++round)
             {
                 var shift = Constants.KeyLeftCircularShift[round];
                 c = ((c << shift) | (c >> (28 - shift))) & ((1 << 28) - 1);

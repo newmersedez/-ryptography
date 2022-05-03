@@ -11,6 +11,7 @@ namespace DES
     {
         static void Main(string[] args)
         {
+            /* Permutation block test */
             // byte[] block = BitConverter.GetBytes(98);
             // byte[] rule = {7, 3, 2, 4, 5, 6, 1};
             // byte[] newBlock = BlockUtils.PermuteBlock(block, rule);
@@ -20,6 +21,7 @@ namespace DES
             // Console.WriteLine(blockString);
             // Console.WriteLine(newBlockString);
             
+            /* Substitution block test */
             // byte[] block = BitConverter.GetBytes(199);
             // Dictionary<byte, byte> rule = new Dictionary<byte, byte>()
             // {
@@ -35,14 +37,22 @@ namespace DES
             // Console.WriteLine("block     = {0}", blockString);
             // Console.WriteLine("new block = {0}", newBlockString);
 
+            /* Expand key class test */
             // ExpandKey gen = new ExpandKey();
             // byte[] key = BitConverter.GetBytes(11422891502611697239);
             // var roundKeys = gen.GenerateRoundKeys(key);
 
-            CypherTransform transform = new CypherTransform();
-            byte[] block = BitConverter.GetBytes(13372281337228);
+            /* Cypher transform class test */
+            // CypherTransform transform = new CypherTransform();
+            // byte[] block = BitConverter.GetBytes(13372281337228);
+            // byte[] key = BitConverter.GetBytes(11422891502611697239);
+            // var transformedBlock = transform.Transform(block, key);
+            
+            /* Cypher context class test */
+            byte[] block = BitConverter.GetBytes(123123123);
             byte[] key = BitConverter.GetBytes(11422891502611697239);
-            var transformedBlock = transform.Transform(block, key);
+            CypherContext cypherEncrypter = new CypherContext(key, EncryptionMode.ECB);
+            var encryptedBlock = cypherEncrypter.Encrypt(block);
         }
     }
 }
