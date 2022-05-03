@@ -41,7 +41,8 @@ namespace DES.Classes
                     byte[] currBlock = new byte[Constants.BlockSize];
                     for(int i = 0; i < encryptedBlock.Length / Constants.BlockSize; i++)
                     {
-                        Array.Copy(encryptedBlock, i * Constants.BlockSize, currBlock, 0, Constants.BlockSize);
+                        Array.Copy(encryptedBlock, i * Constants.BlockSize, currBlock,
+                            0, Constants.BlockSize);
                         currBlocksList.Add(Encrypter.Encrypt(currBlock));
                     }
                     break;
@@ -67,38 +68,38 @@ namespace DES.Classes
             }
             for (int i = 0; i < currBlocksList.Count; i++)
             {
-                Array.Copy(currBlocksList[i], 0, encryptedBlock, i * Constants.BlockSize, Constants.BlockSize);
+                Array.Copy(currBlocksList[i], 0, encryptedBlock,
+                    i * Constants.BlockSize, Constants.BlockSize);
             }
             return encryptedBlock;
         }
 
         public byte[] Decrypt(byte[] block)
         {
-            List<byte[]> blocks = new List<byte[]>();
+            List<byte[]> currBlocksList = new List<byte[]>();
             switch (_mode)
             {
                 case EncryptionMode.ECB:
                 {
-                    byte[] tempBlock = new byte[Constants.BlockSize];
+                    byte[] currBlock = new byte[Constants.BlockSize];
                     for (int i = 0; i < block.Length / Constants.BlockSize; i++)
                     {
-                        Array.Copy(block, i * Constants.BlockSize, tempBlock, 0, Constants.BlockSize);
-                        blocks.Add(Encrypter.Decrypt(tempBlock));
+                        Array.Copy(block, i * Constants.BlockSize, currBlock,
+                            0, Constants.BlockSize);
+                        currBlocksList.Add(Encrypter.Decrypt(currBlock));
                     }
-
                     break;
                 }
             }
-
-            byte[] array = new byte[Constants.BlockSize * blocks.Count];
-            for (int i = 0; i < blocks.Count; i++)
+            byte[] connectedBlock = new byte[Constants.BlockSize * currBlocksList.Count];
+            for (int i = 0; i < currBlocksList.Count; i++)
             {
-                Array.Copy(blocks[i], 0, array, i * Constants.BlockSize, Constants.BlockSize);
+                Array.Copy(currBlocksList[i], 0, connectedBlock,
+                        i * Constants.BlockSize, Constants.BlockSize);
             }
-            byte extraBlocks = array[array.Length - 1];
-            var res = new byte[array.Length - extraBlocks];
-            Array.Copy(array, res, res.Length);
-            return res;
+            var decryptedBlock = new byte[connectedBlock.Length - 1];
+            Array.Copy(connectedBlock, decryptedBlock, decryptedBlock.Length);
+            return decryptedBlock;
         }
 
         private byte[] PaddingPkcs7(byte[] block)

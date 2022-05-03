@@ -31,6 +31,8 @@ namespace DES.Utils
 
         #region CypherTransformConstants
 
+        public static int TransformBlockSize = 6;
+        
         public static readonly byte[] ExpandingPermutation =
         {
             32, 1, 2, 3, 4, 5, 4, 5, 6, 7, 8, 9,
@@ -102,9 +104,9 @@ namespace DES.Utils
         #endregion
 
         #region CypherContextConstants
-
+        
         public static int BlockSize = 8;
-
+        
         #endregion
     }
 }
