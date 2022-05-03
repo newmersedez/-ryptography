@@ -1,7 +1,7 @@
 ﻿namespace DES.Interfaces
 {
-    public interface ICypherTransform
+    internal interface ICypherTransform
     {
-        public byte[] CypherTransform(byte[] block, byte[] roundKey);
+        public byte[] Transform(byte[] block, byte[] roundKey);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace DES.Interfaces
 {
-    public interface IExpandKey
+    internal interface IExpandKey
     {
         public byte[][] GenerateRoundKeys(byte[] key);
     }

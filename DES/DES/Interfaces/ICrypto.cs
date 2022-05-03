@@ -1,6 +1,6 @@
 ﻿namespace DES.Interfaces
 {
-    public interface ICrypto
+    internal interface ICrypto
     {
         public byte[] Encrypt(byte[] block);
         public byte[] Decrypt(byte[] block);
