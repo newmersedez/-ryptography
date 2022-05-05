@@ -20,7 +20,7 @@ namespace DES.Classes
             return BitConverter.GetBytes(number / 2);
         }
 
-        public void GetRoundKeys(byte[] key)
+        public void GenerateRoundKeys(byte[] key)
         {
             throw new System.NotImplementedException();
         }

@@ -6,7 +6,7 @@ using DES.Utils;
 
 namespace DES.Classes
 {
-    internal class CypherTransform : ICypherTransform
+    public class CypherTransform : ICypherTransform
     {
         public byte[] Transform(byte[] block, byte[] roundKey)
         {
@@ -23,7 +23,7 @@ namespace DES.Classes
                 sBlock = Constants.STables[i, edgeBits, middleBits];
                 transformedBlock |= sBlock << i * 4;
             }
-            return BitConverter.GetBytes(transformedBlock);
+            return BlockUtils.Permute32(BitConverter.GetBytes(transformedBlock), Constants.PPermutation);
         }
     }
 }

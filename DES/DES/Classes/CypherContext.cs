@@ -5,7 +5,7 @@ using DES.Utils;
 
 namespace DES.Classes
 {
-    internal enum EncryptionMode
+    public enum EncryptionMode
     {
         ECB,
         CBC,
@@ -16,7 +16,7 @@ namespace DES.Classes
         RDH
     };
 
-    internal class CypherContext
+    public class CypherContext
     {
         private readonly byte[] _key;    
         private readonly EncryptionMode _mode;
@@ -224,8 +224,12 @@ namespace DES.Classes
                 Array.Copy(blocksList[i], 0, connectedBlock,
                         i * Constants.BlockSize, Constants.BlockSize);
             }
-            var decryptedBlock = new byte[connectedBlock.Length - connectedBlock[connectedBlock.Length - 1]];
+
+            var decryptedBlock = new byte[connectedBlock.Length];
             Array.Copy(connectedBlock, decryptedBlock, decryptedBlock.Length);
+            
+            Console.WriteLine(Convert.ToString(BitConverter.ToInt32(block), 2).PadLeft(64, '0'));
+            Console.WriteLine(Convert.ToString(BitConverter.ToInt32(connectedBlock), 2).PadLeft(72, '0'));
             return decryptedBlock;
         }
 

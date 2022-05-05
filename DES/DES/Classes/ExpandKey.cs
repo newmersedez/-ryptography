@@ -4,7 +4,7 @@ using DES.Utils;
 
 namespace DES.Classes
 {
-    internal class ExpandKey : IExpandKey
+    public class ExpandKey : IExpandKey
     {
         public byte[][] GenerateRoundKeys(byte[] key)
         {
