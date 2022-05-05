@@ -49,12 +49,14 @@ namespace DES
             // var transformedBlock = transform.Transform(block, key);
             
             /* Cypher context class test */
-            CypherContext crypto = new CypherContext(BitConverter.GetBytes(11422891502611697239), EncryptionMode.ECB);
-            SimpleCryptoClass encrypter = new SimpleCryptoClass();
-            crypto.Encrypter = encrypter;
-            
-            string text = "lalkaxd";
+            byte[] initializationVector = {1, 1, 1, 1, 1, 1, 1, 1};
+            string text = "lalkaxd1337228";
             byte[] startBlock = Encoding.ASCII.GetBytes(text);
+            
+            CypherContext crypto = new CypherContext(BitConverter.GetBytes(11422891502611697239),
+                EncryptionMode.CTR, initializationVector);
+            crypto.Encrypter = new SimpleCryptoClass();
+            
             var encryptedBlock = crypto.Encrypt(startBlock);
             var decryptedBlock = crypto.Decrypt(encryptedBlock);
             
