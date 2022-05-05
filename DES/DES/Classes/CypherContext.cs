@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using DES.Interfaces;
 using DES.Utils;
 
@@ -24,7 +23,7 @@ namespace DES.Classes
         private readonly byte[] _initializationVector;
         public ICrypto Encrypter { get; set; }
 
-        public CypherContext(byte[] key, EncryptionMode mode, byte[] initializationVector = null)
+        public CypherContext(byte[] key, EncryptionMode mode, byte[] initializationVector = null, params object[] args)
         {
             _key = key;
             _mode = mode;
@@ -40,7 +39,7 @@ namespace DES.Classes
                 case EncryptionMode.ECB:
                 {
                     var currBlock = new byte[Constants.BlockSize];
-                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(resultBlock, i * Constants.BlockSize, currBlock,
                             0, Constants.BlockSize);
@@ -54,7 +53,7 @@ namespace DES.Classes
                     var prevBlock = new byte[Constants.BlockSize];
                     var nextBlock = new byte[Constants.BlockSize];
                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
                             0, Constants.BlockSize);
@@ -70,7 +69,7 @@ namespace DES.Classes
                     var prevBlock = new byte[Constants.BlockSize];
                     var nextBlock = new byte[Constants.BlockSize];
                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
                             0, Constants.BlockSize);
@@ -86,13 +85,12 @@ namespace DES.Classes
                 {
                     var prevBlock = new byte[Constants.BlockSize];
                     var nextBlock = new byte[Constants.BlockSize];
-                    var encryptedBlock = new byte[Constants.BlockSize];
                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
                             0, Constants.BlockSize);
-                        encryptedBlock = Encrypter.Encrypt(prevBlock);
+                        var encryptedBlock = Encrypter.Encrypt(prevBlock);
                         var xorResult = BitConverter.ToUInt64(encryptedBlock) ^ BitConverter.ToUInt64(nextBlock);
                         blocksList.Add(BitConverter.GetBytes(xorResult));
                         Array.Copy(encryptedBlock, prevBlock, Constants.BlockSize);
@@ -106,15 +104,14 @@ namespace DES.Classes
                     _initializationVector.CopyTo(IV, 0);
                     var counter = BitConverter.ToUInt64(IV);
                     var currBlock = new byte[Constants.BlockSize];
-                    for (int i = 0; i < resultBlock.Length / Constants.BlockSize; i++)
+                    for (int i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(resultBlock, i * Constants.BlockSize, currBlock,
                             0, Constants.BlockSize);
                         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(IV)) ^
                                         BitConverter.ToUInt64(currBlock);
                         blocksList.Add(BitConverter.GetBytes(xorResult));
-                        counter++;
-                        IV = BitConverter.GetBytes(counter);
+                        IV = BitConverter.GetBytes(++counter);
                     }
                     break;
                 }
@@ -125,7 +122,7 @@ namespace DES.Classes
                 case EncryptionMode.RDH:
                     break;
             }
-            for (int i = 0; i < blocksList.Count; i++)
+            for (int i = 0; i < blocksList.Count; ++i)
             {
                 Array.Copy(blocksList[i], 0, resultBlock,
                     i * Constants.BlockSize, Constants.BlockSize);
@@ -141,7 +138,7 @@ namespace DES.Classes
                 case EncryptionMode.ECB:
                 {
                     var currBlock = new byte[Constants.BlockSize];
-                    for (var i = 0; i < block.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(block, i * Constants.BlockSize, currBlock,
                             0, Constants.BlockSize);
@@ -156,7 +153,7 @@ namespace DES.Classes
                     var prevBlock = new byte[Constants.BlockSize];
                     var curBlock = new byte[Constants.BlockSize];
                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < block.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(block, i * Constants.BlockSize, curBlock,
                             0, Constants.BlockSize);
@@ -173,7 +170,7 @@ namespace DES.Classes
                     var prevBlock = new byte[Constants.BlockSize];
                     var nextBlock = new byte[Constants.BlockSize];
                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < block.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(block, i * Constants.BlockSize, nextBlock,
                             0, Constants.BlockSize);
@@ -189,13 +186,12 @@ namespace DES.Classes
                 {
                     var prevBlock = new byte[Constants.BlockSize];
                     var curBlock = new byte[Constants.BlockSize];
-                    var encryptBlock = new byte[Constants.BlockSize];
                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < block.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(block, i * Constants.BlockSize, curBlock,
                             0, Constants.BlockSize);
-                        encryptBlock = Encrypter.Encrypt(prevBlock);
+                        var encryptBlock = Encrypter.Encrypt(prevBlock);
                         var xorResult = BitConverter.ToUInt64(encryptBlock) ^ BitConverter.ToUInt64(curBlock);
                         blocksList.Add(BitConverter.GetBytes(xorResult));
                         Array.Copy(encryptBlock, prevBlock, Constants.BlockSize);
@@ -209,22 +205,21 @@ namespace DES.Classes
                     _initializationVector.CopyTo(IV, 0);
                     var counter = BitConverter.ToUInt64(IV);
                     var currBlock = new byte[Constants.BlockSize];
-                    for (int i = 0; i < block.Length / Constants.BlockSize; i++)
+                    for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
                     {
                         Array.Copy(block, i * Constants.BlockSize, currBlock,
                             0, Constants.BlockSize);
                         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(IV)) ^
                                         BitConverter.ToUInt64(currBlock);
                         blocksList.Add(BitConverter.GetBytes(xorResult));
-                        counter++;
-                        IV = BitConverter.GetBytes(counter);
+                        IV = BitConverter.GetBytes(++counter);
                     }
                     break;
                 }
             }
             
             var connectedBlock = new byte[Constants.BlockSize * blocksList.Count];
-            for (var i = 0; i < blocksList.Count; i++)
+            for (var i = 0; i < blocksList.Count; ++i)
             {
                 Array.Copy(blocksList[i], 0, connectedBlock,
                         i * Constants.BlockSize, Constants.BlockSize);
@@ -241,7 +236,7 @@ namespace DES.Classes
             
             var paddedBlock = new byte[block.Length + mod];
             Array.Copy(block, paddedBlock, block.Length);
-            Array.Fill(paddedBlock, (byte)mod, block.Length, mod); 
+            Array.Fill(paddedBlock, mod, block.Length, mod); 
             return paddedBlock;
         }
     }

@@ -11,13 +11,13 @@ namespace DES.Classes
         public byte[] Encrypt(byte[] block)
         {
             var number = BitConverter.ToUInt64(block);
-            return BitConverter.GetBytes(number + 3);
+            return BitConverter.GetBytes(number * 2);
         }
 
         public byte[] Decrypt(byte[] block)
         {
             var number = BitConverter.ToUInt64(block);
-            return BitConverter.GetBytes(number - 3);
+            return BitConverter.GetBytes(number / 2);
         }
 
         public void GetRoundKeys(byte[] key)

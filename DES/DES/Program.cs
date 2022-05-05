@@ -54,7 +54,7 @@ namespace DES
             byte[] startBlock = Encoding.ASCII.GetBytes(text);
             
             CypherContext crypto = new CypherContext(BitConverter.GetBytes(11422891502611697239),
-                EncryptionMode.CTR, initializationVector);
+                EncryptionMode.ECB, initializationVector);
             crypto.Encrypter = new SimpleCryptoClass();
             
             var encryptedBlock = crypto.Encrypt(startBlock);
