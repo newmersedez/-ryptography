@@ -80,21 +80,24 @@ namespace DES
                 CFB - Works
                 OFB - Works
                 CTR - Works
+                RD - =)
+                RDH - =)
              */
             {
                 byte[] initializationVector = { 1, 3, 3, 7, 1, 3, 3, 7 };
-                const string text = "lalkaxd1337228";
+                const string text = "12345678";
                 const ulong key = 1337133713371337;
                 
                 var crypto = new CypherContext(BitConverter.GetBytes(key), 
-                    EncryptionMode.CFB, initializationVector);
+                    EncryptionMode.ECB, initializationVector);
                 crypto.Encrypter = new Classes.DES(new ExpandKey(), new CypherTransform());
                 crypto.Encrypter.GenerateRoundKeys(BitConverter.GetBytes(key));
-
+                // crypto.Encrypter = new SimpleCryptoClass();
+                
                 var startBlock = Encoding.ASCII.GetBytes(text);
                 var encryptedBlock = crypto.Encrypt(startBlock);
                 var decryptedBlock = crypto.Decrypt(encryptedBlock);
-            
+                
                 Console.WriteLine("Before = {0}", text);
                 Console.WriteLine("Encrypted text = {0}", Encoding.UTF8.GetString(encryptedBlock));
                 Console.WriteLine("Decrypted text = {0}", Encoding.UTF8.GetString(decryptedBlock));

@@ -16,7 +16,7 @@ namespace DES.Classes
             ulong transformedBlock = 0;
             for (var i = 0; i < 8; ++i)
             {
-                var sBlock = expandedBlock >> (i * 6) & (1 << 6) - 1;
+                var sBlock = (expandedBlock >> (i * 6)) & ((uint)1 << 6) - 1;
                 var edgeBits = ((sBlock >> 5) << 1) | (sBlock & 1);
                 var middleBits = (sBlock >> 1) & ((1 << 4) - 1);
                 

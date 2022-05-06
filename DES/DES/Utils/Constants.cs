@@ -30,8 +30,8 @@ namespace DES.Utils
         
         #endregion
 
-        #region CypherTransformConstants
         
+        #region CypherTransformConstants
         
         public static readonly byte[] ExpandingPermutation =
         {
@@ -93,7 +93,7 @@ namespace DES.Utils
             }
         };
 
-        public static byte[] PPermutation =
+        public static readonly byte[] PPermutation =
         {
             16, 7, 20, 21, 29, 12, 28, 17,
             1, 15, 23, 26, 5, 18, 31, 10,
@@ -103,15 +103,17 @@ namespace DES.Utils
         
         #endregion
 
+        
         #region CypherContextConstants
         
-        public static int BlockSize = 8;
+        public static readonly int BlockSize = 8;
         
         #endregion
         
+        
         #region DESConstants
         
-        public static byte[] DesStartPermutation = 
+        public static readonly byte[] DesStartPermutation = 
         {
             58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4,
             62, 54, 46, 38, 30, 22, 14, 6, 64, 56, 48, 40, 32, 24, 16, 8,

@@ -21,6 +21,7 @@ namespace DES.Classes
         private readonly byte[] _key;    
         private readonly EncryptionMode _mode;
         private readonly byte[] _initializationVector;
+        private int _cutSize;
         public ICrypto Encrypter { get; set; }
 
         public CypherContext(byte[] key, EncryptionMode mode, byte[] initializationVector = null, params object[] args)
@@ -33,6 +34,7 @@ namespace DES.Classes
         public byte[] Encrypt(byte[] block)
         {
             var resultBlock = PaddingPkcs7(block);
+            _cutSize = resultBlock[^1];
             var blocksList = new List<byte[]>();
             switch (_mode)
             {
@@ -47,7 +49,6 @@ namespace DES.Classes
                     }
                     break;
                 }
-                
                 case EncryptionMode.CBC:
                 {
                     var prevBlock = new byte[Constants.BlockSize];
@@ -62,67 +63,67 @@ namespace DES.Classes
                         Array.Copy(blocksList[i], prevBlock, Constants.BlockSize);
                     }
                     break;
-                }
-                
-                case EncryptionMode.CFB:
-                {
-                    var prevBlock = new byte[Constants.BlockSize];
-                    var nextBlock = new byte[Constants.BlockSize];
-                    Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
-                    {
-                        Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
-                            0, Constants.BlockSize);
-                        var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(prevBlock))
-                                        ^ BitConverter.ToUInt64(nextBlock);
-                        blocksList.Add(BitConverter.GetBytes(xorResult));
-                        Array.Copy(blocksList[i], prevBlock, Constants.BlockSize);
-                    }
-                    break;
-                }
+                 }
+                 
+                 case EncryptionMode.CFB:
+                 {
+                     var prevBlock = new byte[Constants.BlockSize];
+                     var nextBlock = new byte[Constants.BlockSize];
+                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+                     for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+                     {
+                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
+                             0, Constants.BlockSize);
+                         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(prevBlock))
+                                         ^ BitConverter.ToUInt64(nextBlock);
+                         blocksList.Add(BitConverter.GetBytes(xorResult));
+                         Array.Copy(blocksList[i], prevBlock, Constants.BlockSize);
+                     }
+                     break;
+                 }
 
-                case EncryptionMode.OFB:
-                {
-                    var prevBlock = new byte[Constants.BlockSize];
-                    var nextBlock = new byte[Constants.BlockSize];
-                    Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
-                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
-                    {
-                        Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
-                            0, Constants.BlockSize);
-                        var encryptedBlock = Encrypter.Encrypt(prevBlock);
-                        var xorResult = BitConverter.ToUInt64(encryptedBlock) ^ BitConverter.ToUInt64(nextBlock);
-                        blocksList.Add(BitConverter.GetBytes(xorResult));
-                        Array.Copy(encryptedBlock, prevBlock, Constants.BlockSize);
-                    }
-                    break;
-                }
-                
-                case EncryptionMode.CTR:
-                {
-                    var IV = new byte[Constants.BlockSize];
-                    _initializationVector.CopyTo(IV, 0);
-                    var counter = BitConverter.ToUInt64(IV);
-                    var currBlock = new byte[Constants.BlockSize];
-                    for (int i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
-                    {
-                        Array.Copy(resultBlock, i * Constants.BlockSize, currBlock,
-                            0, Constants.BlockSize);
-                        var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(IV)) ^
-                                        BitConverter.ToUInt64(currBlock);
-                        blocksList.Add(BitConverter.GetBytes(xorResult));
-                        IV = BitConverter.GetBytes(++counter);
-                    }
-                    break;
-                }
-                
-                case EncryptionMode.RD:
-                    break;
-                
-                case EncryptionMode.RDH:
-                    break;
+                 case EncryptionMode.OFB:
+                 {
+                     var prevBlock = new byte[Constants.BlockSize];
+                     var nextBlock = new byte[Constants.BlockSize];
+                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+                     for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+                     {
+                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
+                             0, Constants.BlockSize);
+                         var encryptedBlock = Encrypter.Encrypt(prevBlock);
+                         var xorResult = BitConverter.ToUInt64(encryptedBlock) ^ BitConverter.ToUInt64(nextBlock);
+                         blocksList.Add(BitConverter.GetBytes(xorResult));
+                         Array.Copy(encryptedBlock, prevBlock, Constants.BlockSize);
+                     }
+                     break;
+                 }
+                 
+                 case EncryptionMode.CTR:
+                 {
+                     var IV = new byte[Constants.BlockSize];
+                     _initializationVector.CopyTo(IV, 0);
+                     var counter = BitConverter.ToUInt64(IV);
+                     var currBlock = new byte[Constants.BlockSize];
+                     for (int i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+                     {
+                         Array.Copy(resultBlock, i * Constants.BlockSize, currBlock,
+                             0, Constants.BlockSize);
+                         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(IV)) ^
+                                         BitConverter.ToUInt64(currBlock);
+                         blocksList.Add(BitConverter.GetBytes(xorResult));
+                         IV = BitConverter.GetBytes(++counter);
+                     }
+                     break;
+                 }
+                 
+                 case EncryptionMode.RD:
+                     break;
+                 
+                 case EncryptionMode.RDH:
+                     break;
             }
-            for (int i = 0; i < blocksList.Count; ++i)
+            for (var i = 0; i < blocksList.Count; ++i)
             {
                 Array.Copy(blocksList[i], 0, resultBlock,
                     i * Constants.BlockSize, Constants.BlockSize);
@@ -144,7 +145,6 @@ namespace DES.Classes
                             0, Constants.BlockSize);
                         blocksList.Add(Encrypter.Decrypt(currBlock));
                     }
-
                     break;
                 }
                 
@@ -164,7 +164,7 @@ namespace DES.Classes
                     }
                     break;
                 }
-
+                
                 case EncryptionMode.CFB:
                 {
                     var prevBlock = new byte[Constants.BlockSize];
@@ -217,27 +217,20 @@ namespace DES.Classes
                     break;
                 }
             }
-            
-            var connectedBlock = new byte[Constants.BlockSize * blocksList.Count];
+            var connectedBlock = new byte[blocksList.Count * Constants.BlockSize];
             for (var i = 0; i < blocksList.Count; ++i)
             {
                 Array.Copy(blocksList[i], 0, connectedBlock,
                         i * Constants.BlockSize, Constants.BlockSize);
             }
-
-            var decryptedBlock = new byte[connectedBlock.Length];
+            var decryptedBlock = new byte[connectedBlock.Length - _cutSize];
             Array.Copy(connectedBlock, decryptedBlock, decryptedBlock.Length);
-            
-            Console.WriteLine(Convert.ToString(BitConverter.ToInt32(block), 2).PadLeft(64, '0'));
-            Console.WriteLine(Convert.ToString(BitConverter.ToInt32(connectedBlock), 2).PadLeft(72, '0'));
             return decryptedBlock;
         }
 
         private byte[] PaddingPkcs7(byte[] block)
         {
             byte mod = (byte)(Constants.BlockSize - block.Length % Constants.BlockSize);
-            mod = (byte)(mod == 0 ? Constants.BlockSize : mod);
-            
             var paddedBlock = new byte[block.Length + mod];
             Array.Copy(block, paddedBlock, block.Length);
             Array.Fill(paddedBlock, mod, block.Length, mod); 
@@ -245,3 +238,150 @@ namespace DES.Classes
         }
     }
 }
+
+
+/* Encrypt */
+//                 case EncryptionMode.CBC:
+//                 {
+//                     var prevBlock = new byte[Constants.BlockSize];
+//                     var nextBlock = new byte[Constants.BlockSize];
+//                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+//                     for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+//                     {
+//                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
+//                             0, Constants.BlockSize);
+//                         var xorResult = BitConverter.ToUInt64(nextBlock) ^ BitConverter.ToUInt64(prevBlock);
+//                         blocksList.Add(Encrypter.Encrypt(BitConverter.GetBytes(xorResult)));
+//                         Array.Copy(blocksList[i], prevBlock, Constants.BlockSize);
+//                     }
+//                     break;
+//                 }
+//                 
+//                 case EncryptionMode.CFB:
+//                 {
+//                     var prevBlock = new byte[Constants.BlockSize];
+//                     var nextBlock = new byte[Constants.BlockSize];
+//                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+//                     for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+//                     {
+//                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
+//                             0, Constants.BlockSize);
+//                         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(prevBlock))
+//                                         ^ BitConverter.ToUInt64(nextBlock);
+//                         blocksList.Add(BitConverter.GetBytes(xorResult));
+//                         Array.Copy(blocksList[i], prevBlock, Constants.BlockSize);
+//                     }
+//                     break;
+//                 }
+//
+//                 case EncryptionMode.OFB:
+//                 {
+//                     var prevBlock = new byte[Constants.BlockSize];
+//                     var nextBlock = new byte[Constants.BlockSize];
+//                     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+//                     for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+//                     {
+//                         Array.Copy(resultBlock, i * Constants.BlockSize, nextBlock,
+//                             0, Constants.BlockSize);
+//                         var encryptedBlock = Encrypter.Encrypt(prevBlock);
+//                         var xorResult = BitConverter.ToUInt64(encryptedBlock) ^ BitConverter.ToUInt64(nextBlock);
+//                         blocksList.Add(BitConverter.GetBytes(xorResult));
+//                         Array.Copy(encryptedBlock, prevBlock, Constants.BlockSize);
+//                     }
+//                     break;
+//                 }
+//                 
+//                 case EncryptionMode.CTR:
+//                 {
+//                     var IV = new byte[Constants.BlockSize];
+//                     _initializationVector.CopyTo(IV, 0);
+//                     var counter = BitConverter.ToUInt64(IV);
+//                     var currBlock = new byte[Constants.BlockSize];
+//                     for (int i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+//                     {
+//                         Array.Copy(resultBlock, i * Constants.BlockSize, currBlock,
+//                             0, Constants.BlockSize);
+//                         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(IV)) ^
+//                                         BitConverter.ToUInt64(currBlock);
+//                         blocksList.Add(BitConverter.GetBytes(xorResult));
+//                         IV = BitConverter.GetBytes(++counter);
+//                     }
+//                     break;
+//                 }
+//                 
+//                 case EncryptionMode.RD:
+//                     break;
+//                 
+//                 case EncryptionMode.RDH:
+//                     break;
+
+
+/* Decrypt */ 
+// case EncryptionMode.CBC:
+                // {
+                //     var prevBlock = new byte[Constants.BlockSize];
+                //     var curBlock = new byte[Constants.BlockSize];
+                //     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+                //     for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
+                //     {
+                //         Array.Copy(block, i * Constants.BlockSize, curBlock,
+                //             0, Constants.BlockSize);
+                //         var xorResult = BitConverter.ToUInt64(prevBlock) ^
+                //                         BitConverter.ToUInt64(Encrypter.Decrypt(curBlock));
+                //         blocksList.Add(BitConverter.GetBytes(xorResult));
+                //         Array.Copy(curBlock, prevBlock, Constants.BlockSize);
+                //     }
+                //     break;
+                // }
+                //
+                // case EncryptionMode.CFB:
+                // {
+                //     var prevBlock = new byte[Constants.BlockSize];
+                //     var nextBlock = new byte[Constants.BlockSize];
+                //     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+                //     for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
+                //     {
+                //         Array.Copy(block, i * Constants.BlockSize, nextBlock,
+                //             0, Constants.BlockSize);
+                //         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(prevBlock)) ^
+                //                         BitConverter.ToUInt64(nextBlock);
+                //         blocksList.Add(BitConverter.GetBytes(xorResult));
+                //         Array.Copy(nextBlock, prevBlock, Constants.BlockSize);
+                //     }
+                //     break;
+                // }
+                //
+                // case EncryptionMode.OFB:
+                // {
+                //     var prevBlock = new byte[Constants.BlockSize];
+                //     var curBlock = new byte[Constants.BlockSize];
+                //     Array.Copy(_initializationVector, prevBlock, prevBlock.Length);
+                //     for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
+                //     {
+                //         Array.Copy(block, i * Constants.BlockSize, curBlock,
+                //             0, Constants.BlockSize);
+                //         var encryptBlock = Encrypter.Encrypt(prevBlock);
+                //         var xorResult = BitConverter.ToUInt64(encryptBlock) ^ BitConverter.ToUInt64(curBlock);
+                //         blocksList.Add(BitConverter.GetBytes(xorResult));
+                //         Array.Copy(encryptBlock, prevBlock, Constants.BlockSize);
+                //     }
+                //     break;
+                // }
+                //
+                // case EncryptionMode.CTR:
+                // {
+                //     var IV = new byte[Constants.BlockSize];
+                //     _initializationVector.CopyTo(IV, 0);
+                //     var counter = BitConverter.ToUInt64(IV);
+                //     var currBlock = new byte[Constants.BlockSize];
+                //     for (var i = 0; i < block.Length / Constants.BlockSize; ++i)
+                //     {
+                //         Array.Copy(block, i * Constants.BlockSize, currBlock,
+                //             0, Constants.BlockSize);
+                //         var xorResult = BitConverter.ToUInt64(Encrypter.Encrypt(IV)) ^
+                //                         BitConverter.ToUInt64(currBlock);
+                //         blocksList.Add(BitConverter.GetBytes(xorResult));
+                //         IV = BitConverter.GetBytes(++counter);
+                //     }
+                //     break;
+                // }

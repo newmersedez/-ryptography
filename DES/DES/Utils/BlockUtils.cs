@@ -18,7 +18,7 @@ namespace DES.Utils
         
         public static byte[] Permute32(byte[] block, byte[] rule)
         {
-            var number = BitConverter.ToUInt32(block, 0);
+            var number = BitConverter.ToUInt32(block);
             ulong permutedBlock = 0;
             for (var i = 0; i < rule.Length; ++i)
             {

@@ -9,19 +9,20 @@ namespace DES.Classes
         private readonly ICypherTransform _cypherTransformer;
         private byte[][] _roundKeys;
 
-        public FeistelNetwork(IExpandKey keyGen, ICypherTransform cypherEncrypter)
+        public FeistelNetwork(IExpandKey keyGen, ICypherTransform cypherTransformer)
         {
             _keyGenerator = keyGen;
-            _cypherTransformer = cypherEncrypter;
+            _cypherTransformer = cypherTransformer;
         }
 
         public byte[] Encrypt(byte[] block)
         {
-            var number = BitConverter.ToUInt64(block);
-            var oldLeft = (uint)(number >> 32);
-            var oldRight = (uint)((number >> 32) & (((ulong)1 << 32) - 1));
-            uint newLeft = 0, newRight = 0;
-            for (var round = 0; round < 16; ++round)
+            ulong number = BitConverter.ToUInt64(block, 0);
+            uint oldLeft = (uint)(number >> 32);
+            uint oldRight = (uint)(number & ((ulong)1 << 32) - 1);
+            uint newLeft = 0;
+            uint newRight = 0;
+            for (int round = 0; round < 16; round++)
             {
                 newLeft = oldRight;
                 newRight = oldLeft ^ BitConverter.ToUInt32(_cypherTransformer.Transform(BitConverter.GetBytes(oldRight),
@@ -29,26 +30,27 @@ namespace DES.Classes
                 oldLeft = newLeft;
                 oldRight = newRight;
             }
-            number = (number << 32) | newRight;
+            number = (ulong)newLeft << 32 | newRight;
             return BitConverter.GetBytes(number);
         }
 
         public byte[] Decrypt(byte[] block)
         {
-            var number = BitConverter.ToUInt64(block);
-            var oldLeft = (uint)(number >> 32);
-            var oldRight = (uint)((number >> 32) & (((ulong)1 << 32) - 1));
-            uint newLeft = 0, newRight = 0;
-            for (var round = 0; round < 16; ++round)
+            ulong res = BitConverter.ToUInt64(block, 0);
+            uint left = (uint)(res >> 32);
+            uint right = (uint)(res & (((ulong) 1 << 32) - 1));
+            uint newLeft = 0;
+            uint newRight = 0;
+            for (int round = 15; round >= 0; round--)
             {
-                newRight = oldLeft;
-                newLeft = oldRight ^ BitConverter.ToUInt32(_cypherTransformer.Transform(BitConverter.GetBytes(oldLeft),
+                newRight = left;
+                newLeft = right ^ BitConverter.ToUInt32(_cypherTransformer.Transform(BitConverter.GetBytes(left),
                     _roundKeys[round]));
-                oldLeft = newLeft;
-                oldRight = newRight;
+                left = newLeft;
+                right = newRight;
             }
-            number = (number << 32) | newRight;
-            return BitConverter.GetBytes(number);
+            res = (ulong)newLeft << 32 | newRight;
+            return BitConverter.GetBytes(res);
         }
 
         public void GenerateRoundKeys(byte[] key)
