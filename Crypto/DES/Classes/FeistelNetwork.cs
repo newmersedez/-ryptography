@@ -30,7 +30,6 @@ namespace DES.Classes
                 oldLeft = newLeft;
                 oldRight = newRight;
             }
-            // number = (ulong)newLeft << 32 | newRight;
             return BitConverter.GetBytes((ulong)newLeft << 32 | newRight);
         }
 
@@ -49,7 +48,6 @@ namespace DES.Classes
                 oldLeft = newLeft;
                 oldRight = newRight;
             }
-            // number = (ulong)newLeft << 32 | newRight;
             return BitConverter.GetBytes((ulong)newLeft << 32 | newRight);
         }
 

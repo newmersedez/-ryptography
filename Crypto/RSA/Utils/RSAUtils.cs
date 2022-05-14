@@ -27,6 +27,8 @@ namespace RSA.Utils
             if (p < 2)
                 throw new ArgumentOutOfRangeException(nameof(p), "P must not be < 2");
 
+            // проверка p на простоту (например тестом Ферма)
+            
             if (a == 0 || a == 1)
                 return a;
             

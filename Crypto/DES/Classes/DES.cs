@@ -6,7 +6,7 @@ namespace DES.Classes
 {
     public sealed class DES : FeistelNetwork
     {
-        public DES(IExpandKey keyGen, ICypherTransform cypherTransformer) : base(keyGen, cypherTransformer)
+        public DES() : base(new ExpandKey(), new CypherTransform())
         { }
         
         public byte[] EncryptMessage(byte[] message)

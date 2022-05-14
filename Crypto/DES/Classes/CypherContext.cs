@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using DES.Interfaces;
 using DES.Utils;
 
@@ -31,7 +33,16 @@ namespace DES.Classes
             _initializationVector = initializationVector;
         }
 
-        public byte[] Encrypt(byte[] block)
+        private byte[] PaddingPkcs7(byte[] block)
+        {
+            byte mod = (byte)(Constants.BlockSize - block.Length % Constants.BlockSize);
+            var paddedBlock = new byte[block.Length + mod];
+            Array.Copy(block, paddedBlock, block.Length);
+            Array.Fill(paddedBlock, mod, block.Length, mod); 
+            return paddedBlock;
+        }
+        
+        private byte[] Encrypt(byte[] block)
         {
             var resultBlock = PaddingPkcs7(block);
             _cutSize = resultBlock[^1];
@@ -65,8 +76,8 @@ namespace DES.Classes
                     }
                     break;
                  }
-                 
-                 case EncryptionMode.CFB:
+                
+                case EncryptionMode.CFB:
                  {
                      var prevBlock = new byte[Constants.BlockSize];
                      var nextBlock = new byte[Constants.BlockSize];
@@ -83,7 +94,7 @@ namespace DES.Classes
                      break;
                  }
 
-                 case EncryptionMode.OFB:
+                case EncryptionMode.OFB:
                  {
                      var prevBlock = new byte[Constants.BlockSize];
                      var nextBlock = new byte[Constants.BlockSize];
@@ -100,7 +111,7 @@ namespace DES.Classes
                      break;
                  }
                  
-                 case EncryptionMode.CTR:
+                case EncryptionMode.CTR:
                  {
                      var IV = new byte[Constants.BlockSize];
                      _initializationVector.CopyTo(IV, 0);
@@ -115,14 +126,18 @@ namespace DES.Classes
                          blocksList.Add(BitConverter.GetBytes(xorResult));
                          IV = BitConverter.GetBytes(++counter);
                      }
+
                      break;
                  }
-                 
-                 case EncryptionMode.RD:
-                     break;
-                 
-                 case EncryptionMode.RDH:
-                     break;
+                
+                case EncryptionMode.RD:
+                    break;
+                
+                case EncryptionMode.RDH:
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(_mode), "Incorrect mode");
             }
             for (var i = 0; i < blocksList.Count; ++i)
             {
@@ -132,7 +147,7 @@ namespace DES.Classes
             return resultBlock;
         }
 
-        public byte[] Decrypt(byte[] block)
+        private byte[] Decrypt(byte[] block)
         {
             var blocksList = new List<byte[]>();
             switch (_mode)
@@ -217,6 +232,15 @@ namespace DES.Classes
                     }
                     break;
                 }
+                
+                case EncryptionMode.RD:
+                    break;
+                
+                case EncryptionMode.RDH:
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(_mode), "Incorrect mode");
             }
             var connectedBlock = new byte[blocksList.Count * Constants.BlockSize];
             for (var i = 0; i < blocksList.Count; ++i)
@@ -228,13 +252,18 @@ namespace DES.Classes
             return connectedBlock;
         }
 
-        private byte[] PaddingPkcs7(byte[] block)
+        public void Encrypt(string originPath, string encryptedPath)
         {
-            byte mod = (byte)(Constants.BlockSize - block.Length % Constants.BlockSize);
-            var paddedBlock = new byte[block.Length + mod];
-            Array.Copy(block, paddedBlock, block.Length);
-            Array.Fill(paddedBlock, mod, block.Length, mod); 
-            return paddedBlock;
+            var bytes = File.ReadAllBytes(originPath);
+            var encryptedBytes = Encrypt(bytes);
+            File.WriteAllBytes(encryptedPath, encryptedBytes);
+        }
+
+        public void Decrypt(string originPath, string decryptedPath)
+        {
+            var bytes = File.ReadAllBytes(originPath);
+            var decryptedBytes = Decrypt(bytes);
+            File.WriteAllBytes(decryptedPath, decryptedBytes);
         }
     }
 }
