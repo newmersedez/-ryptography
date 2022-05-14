@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Numerics;
+using RSA.Classes;
 
 namespace RSA
 {
@@ -6,7 +8,10 @@ namespace RSA
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var a = new BigInteger(11);
+            var test = new FermaPrimalityTest();
+            var res = test.SimplicityTest(a, 0.5);
+            Console.WriteLine(res);
         }
     }
 }

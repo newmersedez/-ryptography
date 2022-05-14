@@ -4,6 +4,6 @@ namespace RSA.Interfaces
 {
     public interface IPrimalityTest
     {
-        public bool SimplicityTest(BigInteger probability, double min);
+        public bool SimplicityTest(BigInteger n, double minProbability);
     }
 }

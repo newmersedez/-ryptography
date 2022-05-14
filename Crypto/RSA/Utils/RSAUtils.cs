@@ -1,33 +1,17 @@
 ﻿using System;
 using System.Numerics;
+using System.Security.Cryptography;
 
 namespace RSA.Utils
 {
     public static class MathUtils
     {
-        public static BigInteger Gcd(BigInteger a, BigInteger b)
-        {
-                while (a != 0 && b != 0)
-                {
-                    if (a > b)
-                        a %= b;
-                    else
-                        b %= a;
-                }
-                return a + b;
-        }
-
-        public static BigInteger FastPow(BigInteger a, BigInteger degree)
-        {
-            throw new NotImplementedException();
-        }
-        
         public static BigInteger Legendre(BigInteger a, BigInteger p)
         {
             if (p < 2)
                 throw new ArgumentOutOfRangeException(nameof(p), "P must not be < 2");
 
-            // проверка p на простоту (например тестом Ферма)
+            //TODO: проверка p на простоту (например тестом Ферма)
             
             if (a == 0 || a == 1)
                 return a;
@@ -36,7 +20,7 @@ namespace RSA.Utils
             if (a % 2 == 0)
             {
                 result = Legendre(a / 2, p);
-                if (((p * p - 1) & 8) != 0);
+                if (((p * p - 1) & 8) != 0)
                     result = -result;
             }
             else
@@ -45,12 +29,13 @@ namespace RSA.Utils
                 if (((a - 1) * (p - 1) & 4) != 0)
                     result = -result;
             }
+            
             return result;
         }
 
         public static BigInteger Jacobi(BigInteger a, BigInteger b)
         {
-            if (Gcd(a, b) != 1)
+            if (BigInteger.GreatestCommonDivisor(a, b) != 1)
                 return 0;
             
             var r = 1;
@@ -66,7 +51,7 @@ namespace RSA.Utils
                 while (a % 2 == 0)
                 {
                     a /= 2;
-                    t++;
+                    ++t;
                 }
                 if (t % 2 == 1)
                 {
@@ -81,7 +66,24 @@ namespace RSA.Utils
                 a = b % c;
                 b = c;
             } while (a != 0);
+            
             return r;
         }
+        
+        public static BigInteger GenerateRandomInteger(BigInteger left, BigInteger right)
+        {
+            var rndGenerator = RandomNumberGenerator.Create();
+            var bytes = right.ToByteArray();
+            BigInteger r;
+            do
+            {
+                rndGenerator.GetBytes(bytes);
+                r = new BigInteger(bytes);
+            } while (!(r >= left && r <= right));
+
+            return r;
+        }
+        
+        
     }
 }
