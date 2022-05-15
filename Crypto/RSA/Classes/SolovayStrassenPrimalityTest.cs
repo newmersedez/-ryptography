@@ -8,6 +8,8 @@ namespace RSA.Classes
     {
         public bool SimplicityTest(BigInteger n, double minProbability)
         {
+            if (minProbability is not (>= 0.5 and < 1))
+                throw new ArgumentOutOfRangeException(nameof(minProbability), "minProbability must be [0.5, 1)");
             if (n == 1)
                 return false;
             
