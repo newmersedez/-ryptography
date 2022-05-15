@@ -4,7 +4,7 @@ using RSA.Interfaces;
 
 namespace RSA.Classes
 {
-    public class FermaPrimalityTest : IPrimalityTest
+    public sealed class FermatPrimalityTest : IPrimalityTest
     {
         public bool SimplicityTest(BigInteger n, double minProbability)
         {

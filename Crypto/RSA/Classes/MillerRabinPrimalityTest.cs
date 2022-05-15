@@ -4,7 +4,7 @@ using RSA.Interfaces;
 
 namespace RSA.Classes
 {
-    public class MillerRabinPrimalityTest : IPrimalityTest
+    public sealed class MillerRabinPrimalityTest : IPrimalityTest
     {
         public bool SimplicityTest(BigInteger n, double minProbability)
         {

@@ -4,7 +4,7 @@ using RSA.Interfaces;
 
 namespace RSA.Classes
 {
-    public class SolovayStrassenPrimalityTest : IPrimalityTest
+    public sealed class SolovayStrassenPrimalityTest : IPrimalityTest
     {
         public bool SimplicityTest(BigInteger n, double minProbability)
         {

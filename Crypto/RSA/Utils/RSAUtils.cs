@@ -84,6 +84,18 @@ namespace RSA.Utils
             return r;
         }
         
-        
+        public static BigInteger ExtendedEuclideanAlgorithm(BigInteger a, BigInteger b, out BigInteger x, out BigInteger y)
+        {
+            if (b == 0)
+            {
+                x = 1;
+                y = 0;
+                return a;
+            }
+            var gcd = ExtendedEuclideanAlgorithm(b, a % b, out var tmpX, out var tmpY);
+            y = tmpX - tmpY * (a / b);
+            x = tmpY;
+            return gcd;
+        }
     }
 }
