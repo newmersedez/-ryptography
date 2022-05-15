@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DES", "DES\DES.csproj", "{E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSA", "RSA\RSA.csproj", "{91D71EC0-E759-40CB-B3FD-6DFE402206E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES", "AES\AES.csproj", "{C63D4600-5D1D-4DD3-889C-53B9C07841CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{91D71EC0-E759-40CB-B3FD-6DFE402206E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91D71EC0-E759-40CB-B3FD-6DFE402206E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91D71EC0-E759-40CB-B3FD-6DFE402206E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63D4600-5D1D-4DD3-889C-53B9C07841CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63D4600-5D1D-4DD3-889C-53B9C07841CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63D4600-5D1D-4DD3-889C-53B9C07841CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63D4600-5D1D-4DD3-889C-53B9C07841CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

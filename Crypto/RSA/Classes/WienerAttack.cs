@@ -7,7 +7,7 @@ namespace RSA.Classes
 {
     public class WienerAttack
     {
-        Tuple<BigInteger, List<Tuple<BigInteger, BigInteger>>> Attack(BigInteger e)
+        public Tuple<BigInteger, List<Tuple<BigInteger, BigInteger>>> Attack(BigInteger n, BigInteger e)
         {
             throw new NotImplementedException();
         }

@@ -12,6 +12,8 @@ namespace RSA.Classes
 
     public sealed class RSA
     {
+        #region Nested
+
         private struct Key
         {
             public BigInteger n;
@@ -118,8 +120,16 @@ namespace RSA.Classes
             }
         }
 
+        #endregion
+
+        #region Variables
+
         private readonly RSAKeyGenerator _keygen;
         private Key _key;
+
+        #endregion
+
+        #region Methods
 
         public RSA(PrimalityTestMode mode, double minProbability, ulong length)
         {
@@ -141,5 +151,7 @@ namespace RSA.Classes
         {
             _key = _keygen.GenerateKey();
         }
+
+        #endregion
     }
 }
