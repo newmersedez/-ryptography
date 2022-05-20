@@ -26,6 +26,7 @@ namespace RSA.Classes
                 var x = BigInteger.ModPow(a, d, n);
                 if (x == 1 || x == n - 1)
                     continue;
+                
                 for (var r = 1; r < degree; ++r)
                 {
                     x = BigInteger.ModPow(x, 2, n);
@@ -34,6 +35,7 @@ namespace RSA.Classes
                     if (x == n - 1)
                         break;
                 }
+                
                 if (x != n - 1)
                     return false;
             }

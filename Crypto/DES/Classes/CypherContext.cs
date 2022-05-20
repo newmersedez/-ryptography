@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using DES.Interfaces;
 using DES.Utils;
@@ -24,13 +25,15 @@ namespace DES.Classes
         private readonly EncryptionMode _mode;
         private readonly byte[] _initializationVector;
         private int _cutSize;
+        private string _strParam;
         public ICrypto Encrypter { get; set; }
 
-        public CypherContext(byte[] key, EncryptionMode mode, byte[] initializationVector = null, params object[] args)
+        public CypherContext(byte[] key, EncryptionMode mode, byte[] initializationVector = null, string strParam=null)
         {
             _key = key;
             _mode = mode;
             _initializationVector = initializationVector;
+            _strParam = strParam;
         }
 
         private byte[] PaddingPkcs7(byte[] block)
@@ -129,24 +132,59 @@ namespace DES.Classes
 
                      break;
                  }
-                
+
                 case EncryptionMode.RD:
+                {
+                    var curBlock = new byte[Constants.BlockSize];
+                    var copyIV = new byte[8];
+                    _initializationVector.CopyTo(copyIV, 0);
+                    var IV = BitConverter.ToUInt64(copyIV);
+                    var delta = BitConverter.ToUInt64(_initializationVector);
+                    blocksList.Add(Encrypter.Encrypt(copyIV));
+                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+                    {
+                        Array.Copy(resultBlock, i * Constants.BlockSize, curBlock, 0, Constants.BlockSize);
+                        var xorResult = BitConverter.ToUInt64(copyIV, 0) ^ BitConverter.ToUInt64(curBlock, 0);
+                        blocksList.Add(Encrypter.Encrypt(BitConverter.GetBytes(xorResult)));
+                        IV += delta;
+                        copyIV = BitConverter.GetBytes(IV);
+                    }
                     break;
-                
+                }
+
                 case EncryptionMode.RDH:
+                {
+                    var curBlock = new byte[Constants.BlockSize];
+                    var copyIV = new byte[8];
+                    Array.Copy(_initializationVector, 0, copyIV, 0, Constants.BlockSize);
+                    var IV = BitConverter.ToUInt64(copyIV);
+                    var delta = BitConverter.ToUInt64(_initializationVector);
+                    blocksList.Add(Encrypter.Encrypt(copyIV));
+                    var xorResult = BitConverter.ToUInt64(copyIV, 0) ^
+                                    BitConverter.ToUInt64(PaddingPkcs7(BitConverter.GetBytes(block.GetHashCode())));
+                    blocksList.Add(BitConverter.GetBytes(xorResult));
+                    for (var i = 0; i < resultBlock.Length / Constants.BlockSize; ++i)
+                    {
+                        IV += delta;
+                        copyIV = BitConverter.GetBytes(IV);
+                        Array.Copy(resultBlock, i * Constants.BlockSize, curBlock, 0, Constants.BlockSize);
+                        xorResult = BitConverter.ToUInt64(copyIV, 0) ^ BitConverter.ToUInt64(curBlock);
+                        blocksList.Add(Encrypter.Encrypt(BitConverter.GetBytes(xorResult)));
+                    }
                     break;
+                }
                 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(_mode), "Incorrect mode");
             }
+            var connecterBlock = new byte[Constants.BlockSize * blocksList.Count];
             for (var i = 0; i < blocksList.Count; ++i)
             {
-                Array.Copy(blocksList[i], 0, resultBlock,
-                    i * Constants.BlockSize, Constants.BlockSize);
+                Array.Copy(blocksList[i], 0, connecterBlock, i * Constants.BlockSize, Constants.BlockSize);
             }
-            return resultBlock;
+            return connecterBlock;
         }
-
+        
         private byte[] Decrypt(byte[] block)
         {
             var blocksList = new List<byte[]>();
@@ -232,12 +270,48 @@ namespace DES.Classes
                     }
                     break;
                 }
-                
+
                 case EncryptionMode.RD:
+                {
+                    var curBlock = new byte[Constants.BlockSize];
+                    var copyIV = new byte[8];
+                    var delta = BitConverter.ToUInt64(_initializationVector);
+                    Array.Copy(block, 0, curBlock, 0, Constants.BlockSize);
+                    copyIV = Encrypter.Decrypt(curBlock);
+                    var IV = BitConverter.ToUInt64(copyIV);
+                    for (var i = 1; i < block.Length / Constants.BlockSize; ++i)
+                    {
+                        Array.Copy(block, i * Constants.BlockSize, curBlock, 0, Constants.BlockSize);
+                        var xorResult = BitConverter.ToUInt64(Encrypter.Decrypt(curBlock), 0) ^
+                                        BitConverter.ToUInt64(copyIV, 0);
+                        blocksList.Add(BitConverter.GetBytes(xorResult));
+                        IV += delta;
+                        copyIV = BitConverter.GetBytes(IV);
+                    }
                     break;
+                }
                 
                 case EncryptionMode.RDH:
+                {
+                    var curBlock = new byte[Constants.BlockSize];
+                    var copyIV = new byte[8];
+                    var delta = BitConverter.ToUInt64(_initializationVector);
+                    Array.Copy(block, 0, curBlock, 0, Constants.BlockSize);
+                    copyIV = Encrypter.Decrypt(curBlock);
+                    var IV = BitConverter.ToUInt64(copyIV);
+                    Array.Copy(block, 8, curBlock, 0, Constants.BlockSize);
+                    var xorResult = BitConverter.ToUInt64(copyIV)
+                                    ^ BitConverter.ToUInt64(PaddingPkcs7(BitConverter.GetBytes(_strParam.GetHashCode())));
+                    for (var i = 2; i < block.Length / Constants.BlockSize; ++i)
+                    {
+                        IV += delta;
+                        copyIV = BitConverter.GetBytes(IV);
+                        Array.Copy(block, i * Constants.BlockSize, curBlock, 0, Constants.BlockSize);
+                        xorResult = BitConverter.ToUInt64(Encrypter.Decrypt(curBlock)) ^ BitConverter.ToUInt64(copyIV);
+                        blocksList.Add(BitConverter.GetBytes(xorResult));
+                    }
                     break;
+                }
                 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(_mode), "Incorrect mode");
@@ -248,8 +322,9 @@ namespace DES.Classes
                 Array.Copy(blocksList[i], 0, connectedBlock,
                         i * Constants.BlockSize, Constants.BlockSize);
             }
-            Array.Resize(ref connectedBlock, connectedBlock.Length - _cutSize);
-            return connectedBlock;
+            var returnBlock = new byte[connectedBlock.Length - _cutSize];
+            Array.Copy(connectedBlock, returnBlock, returnBlock.Length);
+            return returnBlock;
         }
 
         public void Encrypt(string originPath, string encryptedPath)

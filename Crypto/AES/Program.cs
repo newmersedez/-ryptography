@@ -24,7 +24,7 @@ namespace AES
                 byte a = 123;
                 Console.WriteLine(GF256.Inverse(a, modulo));
             }
-
+            
             {
                 byte a = 11;
                 Console.WriteLine(GF256.CheckIrreducibility(a));

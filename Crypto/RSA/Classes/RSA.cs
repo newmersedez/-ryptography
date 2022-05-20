@@ -146,7 +146,7 @@ namespace RSA.Classes
         {
             return BigInteger.ModPow(origin, _key.d, _key.n);
         }
-
+        
         public void GenerateNewKey()
         {
             _key = _keygen.GenerateKey();

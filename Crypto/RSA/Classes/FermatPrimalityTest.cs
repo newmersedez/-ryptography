@@ -15,8 +15,8 @@ namespace RSA.Classes
             
             for (var i = 0; 1.0 - Math.Pow(2, -i) <= minProbability; ++i)
             {
-                Console.WriteLine(i);
                 var a = Utils.MathUtils.GenerateRandomInteger(2, n - 1);
+                // Console.WriteLine(a);
                 if (BigInteger.ModPow(a, n - 1, n) != 1)
                     return false;
             }

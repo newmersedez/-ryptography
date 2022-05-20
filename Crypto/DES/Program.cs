@@ -13,11 +13,11 @@ namespace DES
     {
         private static void Main(string[] args)
         {
-            byte[] initializationVector = { 1, 3, 3, 7, 1, 3, 3, 7 };
+            byte[] initializationVector = { 1, 1, 1, 1, 1, 1, 1, 1};
             const ulong key = 1337133713371337;
             
             var crypto = new CypherContext(BitConverter.GetBytes(key), 
-                EncryptionMode.OFB, initializationVector);
+                EncryptionMode.RDH, initializationVector, "lalka");
             crypto.Encrypter = new Classes.DES();
             crypto.Encrypter.GenerateRoundKeys(BitConverter.GetBytes(key));
             

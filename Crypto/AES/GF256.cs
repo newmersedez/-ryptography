@@ -5,23 +5,25 @@ namespace AES
 {
     public static class GF256
     {
-        public static byte Add(byte firstPolynomial, byte secondPolynomial)
+        #region PublicMethods
+
+        public static byte Add(byte first, byte second)
         {
-            return (byte)(firstPolynomial ^ secondPolynomial);
+            return (byte)(first ^ second);
         }
         
-        public static byte Multipy(byte firstPolynomial, byte secondPolynomial, UInt16 modulo)
+        public static byte Multipy(byte first, byte second, UInt16 modulo)
         {
             byte result = 0;
-            while (firstPolynomial != 0 && secondPolynomial != 0)
+            while (first != 0 && second != 0)
             {
-                if ((secondPolynomial & 1) != 0)
-                    result ^= firstPolynomial;
-                if ((firstPolynomial & 0x80) != 0)
-                    firstPolynomial = (byte)((firstPolynomial << 1) ^ modulo);
+                if ((second & 1) != 0)
+                    result ^= first;
+                if ((first & 0x80) != 0)
+                    first = (byte)((first << 1) ^ modulo);
                 else
-                    firstPolynomial <<= 1;
-                secondPolynomial >>= 1;
+                    first <<= 1;
+                second >>= 1;
             }
             return result;
         }
@@ -45,71 +47,101 @@ namespace AES
 
         public static bool CheckIrreducibility(byte polynomial)
         {
-            UInt16 num = 0;
-            UInt16 one = 1;
-            
-            for (UInt16 i = 0; i < 14; i++)
+            for (uint i = 2; i < polynomial; ++i)
             {
-                if((one & polynomial) != 0)
-                    num = i;
-                one <<= 1;
+                for (uint j = 2; j < polynomial; ++j)
+                {
+                    uint l = 0b10000000000, r = 0b10000000000;
+                    uint midResult = 0;
+                    while (l != 0)
+                    {
+                        while (r != 0)
+                        {
+                            midResult ^= PolyMultiply(i & l, j & r);
+                            r >>= 1;
+                        }
+                        l >>= 1;
+                        r = 0b10000000;
+                    }
+                    if (midResult == polynomial)
+                            return false;
+                }
             }
-
-            return num == 0;
+            
+            return true;
         }
 
-        public static byte GetIrreduciblePolynomials(byte Polynomial)
+        public static byte[] GetIrreduciblePolynomials(byte polynomial)
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region PrivateMethods
+
+        private static UInt16 ModPolyMultiply(UInt16 first, UInt16 second, UInt16 modulo)
+        {
+            UInt16 result = 0;
+            while (first != 0)
+            {
+                if ((first & 1) != 0)
+                    result = (UInt16)((result + second) % modulo);
+                second = (UInt16)((second << 1) % modulo);
+                first >>= 1;
+            }
+            return (result);
+        }
         
-        private static UInt16 HigherBits(UInt16 polynomial)
+        private static uint PolyMultiply(uint first, uint second)
+        {
+            var result = first;
+            if (second == 0)
+                return 0;
+            while (second != 1)
+            {
+                result <<= 1;
+                second >>= 1;
+            }
+            return result;
+        }
+        
+        private static UInt16 GetHigherBits(UInt16 polynomial)
         {
             if (polynomial == 0)
                 return 0;
-            UInt16 count = 1;
+            UInt16 result = 1;
             while (polynomial != 1)
             {
                 polynomial >>= 1;
-                count <<= 1;
+                result <<= 1;
             }
 
-            return count;
-        }
-
-        private static UInt16 MultiplyHelper(UInt16 left, UInt16 right)
-        {
-            if (right == 0)
-                return 0;
-            while (right != 1)
-            {
-                left <<= 1;
-                right >>= 1;
-            }
-            return left;
+            return result;
         }
         
-        private static byte Modulo(UInt16 num, UInt16 modulo)
+        private static byte Modulo(UInt16 polynomial, UInt16 modulo)
         {
-            UInt16 lDeg = HigherBits(num);
-            UInt16 baseDeg = HigherBits(modulo);
+            UInt16 polynomialDegree = GetHigherBits(polynomial);
+            UInt16 moduloDegree = GetHigherBits(modulo);
 
-            while (lDeg >= baseDeg)
+            while (polynomialDegree >= moduloDegree)
             {
-                UInt16 tmpLeft = lDeg;
-                UInt16 tmpRight = baseDeg;
+                UInt16 tmpLeft = polynomialDegree;
+                UInt16 tmpRight = moduloDegree;
                 while (tmpRight != 1)
                 {
                     tmpLeft >>= 1;
                     tmpRight >>= 1;
                 }
 
-                UInt16 tmpMulResult = MultiplyHelper(modulo, tmpLeft);
-                num ^= tmpMulResult;
-                lDeg = HigherBits(num);
+                UInt16 tmpMulResult = ModPolyMultiply(modulo, tmpLeft, modulo);
+                polynomial ^= tmpMulResult;
+                polynomialDegree = GetHigherBits(polynomial);
             }
-            
-            return (byte)num;
+            return (byte)polynomial;
         }
+        
+        #endregion
     }
 }
